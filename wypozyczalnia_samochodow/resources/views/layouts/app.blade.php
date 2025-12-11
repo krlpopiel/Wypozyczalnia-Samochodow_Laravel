@@ -94,7 +94,7 @@
         <!-- Stopka -->
         <footer class="bg-gray-800 text-white py-6 mt-auto">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <p>&copy; {{ date('Y') }} AutoRent. Aplikacja studencka.</p>
+                <p>&copy; {{ date('Y') }} AutoRent. &copy;Adrian Popielarczyk 2025</p>
             </div>
         </footer>
     </div>
