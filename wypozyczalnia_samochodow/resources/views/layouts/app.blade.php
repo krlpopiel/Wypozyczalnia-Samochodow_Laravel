@@ -7,7 +7,6 @@
 
     <title>{{ config('app.name', 'Wypożyczalnia') }}</title>
 
-    <!-- TailwindCSS Script (w produkcji użyj vite build) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -20,7 +19,6 @@
 </head>
 <body class="font-sans antialiased bg-gray-100 text-gray-900">
     
-    <!-- WAŻNE: Skip Link dla nawigacji klawiaturą (A11y) -->
     <a href="#main-content" 
        class="absolute top-0 left-0 p-3 bg-blue-600 text-white -translate-y-full transition-transform focus:translate-y-0 z-50">
         Przejdź do głównej treści
@@ -28,14 +26,13 @@
 
     <div class="min-h-screen flex flex-col">
         
-        <!-- Nawigacja -->
         <nav class="bg-white border-b border-gray-100" role="navigation" aria-label="Menu główne">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <a href="{{ route('home') }}" class="text-xl font-bold text-blue-700">
+                            <a href="{{ url('/') }}" class="text-xl font-bold text-blue-700">
                                 AutoRent
                             </a>
                         </div>
@@ -45,28 +42,45 @@
                             <a href="{{ route('cars.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                                 Oferta
                             </a>
+
+                            @auth
+                                <!-- Link "Moje Rezerwacje" dla każdego zalogowanego -->
+                                <a href="{{ route('rentals.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                                    Moje Rezerwacje
+                                </a>
+
+                                <!-- Link do Panelu Pracownika (Tylko dla admina i pracownika) -->
+                                @if(in_array(Auth::user()->role, ['admin', 'employee']))
+                                    <a href="{{ route('employee.dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-red-300 text-sm font-bold leading-5 text-red-600 hover:text-red-800 focus:outline-none focus:text-red-800 focus:border-red-300 transition duration-150 ease-in-out">
+                                        Panel Pracownika
+                                    </a>
+                                @endif
+                            @endauth
                         </div>
                     </div>
 
                     <!-- Użytkownik / Auth -->
                     <div class="flex items-center">
                         @auth
-                            <span class="mr-4 text-sm text-gray-600">Witaj, {{ Auth::user()->name }}</span>
-                            <!-- Formularz wylogowania -->
-                            <form method="POST" action="{{ route('logout') }}">
+                            <span class="mr-4 text-sm text-gray-600">
+                                {{ Auth::user()->name }} 
+                                <span class="text-xs text-gray-400">({{ Auth::user()->role }})</span>
+                            </span>
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
                                 <button type="submit" class="text-sm text-red-600 hover:underline">Wyloguj</button>
                             </form>
                         @else
                             <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-blue-600">Logowanie</a>
-                            <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 hover:text-blue-600">Rejestracja</a>
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 hover:text-blue-600">Rejestracja</a>
+                            @endif
                         @endauth
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Nagłówek strony -->
         @if (isset($header))
             <header class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -77,13 +91,21 @@
             </header>
         @endif
 
-        <!-- Główna treść (Main) - atrybut id dla skip-link -->
         <main id="main-content" class="flex-grow">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <!-- Flash messages -->
                 @if(session('success'))
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
                         <p>{{ session('success') }}</p>
+                    </div>
+                @endif
+                
+                @if($errors->any())
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+                        <ul class="list-disc pl-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -91,10 +113,9 @@
             </div>
         </main>
 
-        <!-- Stopka -->
         <footer class="bg-gray-800 text-white py-6 mt-auto">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <p>&copy; {{ date('Y') }} AutoRent. &copy;Adrian Popielarczyk 2025</p>
+                <p>&copy; {{ date('Y') }} AutoRent. Wszystkie prawa zastrzeżone.</p>
             </div>
         </footer>
     </div>
