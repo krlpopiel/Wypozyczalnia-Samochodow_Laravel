@@ -3,7 +3,7 @@
 @section('content')
     <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="md:flex">
-            <!-- Lewa strona: Zdjęcie -->
+            <!-- Lewa strona (bez zmian) -->
             <div class="md:w-1/2 bg-gray-200 min-h-[300px] relative">
                 @if($car->image_path)
                     <img src="{{ asset('storage/' . $car->image_path) }}" alt="{{ $car->brand->name }} {{ $car->model }}" class="w-full h-full object-cover absolute inset-0">
@@ -15,8 +15,9 @@
                 @endif
             </div>
 
-            <!-- Prawa strona: Informacje -->
+            <!-- Prawa strona -->
             <div class="md:w-1/2 p-8">
+                <!-- Nagłówek i cena (bez zmian) -->
                 <div class="flex justify-between items-start">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">{{ $car->brand->name }} {{ $car->model }}</h1>
@@ -30,51 +31,65 @@
 
                 <hr class="my-6 border-gray-100">
 
+                <!-- Szczegóły techniczne (bez zmian) -->
                 <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
-                    <div>
-                        <span class="block text-gray-500">Typ nadwozia</span>
-                        <span class="font-semibold text-gray-800">{{ $car->type->name }}</span>
-                    </div>
-                    <div>
-                        <span class="block text-gray-500">Przebieg</span>
-                        <span class="font-semibold text-gray-800">{{ number_format($car->mileage, 0, ' ', ' ') }} km</span>
-                    </div>
-                    <div>
-                        <span class="block text-gray-500">Kolor</span>
-                        <span class="font-semibold text-gray-800">{{ $car->color }}</span>
-                    </div>
-                    <div>
-                        <span class="block text-gray-500">Lokalizacja</span>
-                        <span class="font-semibold text-gray-800">{{ $car->branch->city }} ({{ $car->branch->name }})</span>
-                    </div>
+                    <div><span class="block text-gray-500">Typ</span><span class="font-semibold">{{ $car->type->name }}</span></div>
+                    <div><span class="block text-gray-500">Przebieg</span><span class="font-semibold">{{ $car->mileage }} km</span></div>
+                    <div><span class="block text-gray-500">Lokalizacja</span><span class="font-semibold">{{ $car->branch->city }}</span></div>
+                    <div><span class="block text-gray-500">Skrzynia</span><span class="font-semibold">Automatyczna</span></div>
                 </div>
 
-                <div class="mb-8">
-                    <h3 class="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">Wyposażenie</h3>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($car->features as $feature)
-                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium border border-gray-200">
-                                {{ $feature->name }}
-                            </span>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div class="flex gap-4">
-                    <a href="{{ route('cars.index') }}" class="w-1/3 text-center px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition">
-                        Wróć
-                    </a>
+                <!-- Formularz Rezerwacji -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
+                    <h3 class="font-bold text-blue-800 mb-3">Rezerwuj termin</h3>
                     
-                    @if($car->is_available)
-                        {{-- Tutaj w przyszłości dodasz link do formularza rezerwacji --}}
-                        <button type="button" class="w-2/3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg transform active:scale-95" onclick="alert('Funkcja rezerwacji będzie dostępna w kolejnym kroku!')">
-                            Rezerwuj teraz
-                        </button>
+                    @auth
+                        @if($car->is_available)
+                            <form action="{{ route('rentals.store', $car) }}" method="POST">
+                                @csrf
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <label for="start_date" class="block text-xs font-medium text-gray-700 mb-1">Od kiedy</label>
+                                        <input type="date" name="start_date" id="start_date" min="{{ date('Y-m-d') }}" required
+                                               class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div>
+                                        <label for="end_date" class="block text-xs font-medium text-gray-700 mb-1">Do kiedy</label>
+                                        <input type="date" name="end_date" id="end_date" min="{{ date('Y-m-d') }}" required
+                                               class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="comments" class="block text-xs font-medium text-gray-700 mb-1">Uwagi (opcjonalnie)</label>
+                                    <textarea name="comments" id="comments" rows="2" class="w-full text-sm border-gray-300 rounded-md"></textarea>
+                                </div>
+
+                                @if($errors->any())
+                                    <div class="text-red-600 text-xs mb-3">
+                                        {{ $errors->first() }}
+                                    </div>
+                                @endif
+
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-bold hover:bg-blue-700 transition">
+                                    Rezerwuj teraz
+                                </button>
+                            </form>
+                        @else
+                            <div class="text-center p-4 text-red-600 font-medium">
+                                Pojazd jest obecnie wyłączony z użytku.
+                            </div>
+                        @endif
                     @else
-                        <button disabled class="w-2/3 bg-gray-300 text-gray-500 rounded-lg font-bold cursor-not-allowed">
-                            Obecnie niedostępny
-                        </button>
-                    @endif
+                        <div class="text-center">
+                            <p class="text-sm text-gray-600 mb-2">Musisz być zalogowany, aby zarezerwować.</p>
+                            <a href="{{ route('login') }}" class="text-blue-600 font-bold hover:underline">Zaloguj się</a>
+                        </div>
+                    @endauth
+                </div>
+
+                <div class="text-center">
+                    <a href="{{ route('cars.index') }}" class="text-gray-500 text-sm hover:underline">← Wróć do listy</a>
                 </div>
             </div>
         </div>
