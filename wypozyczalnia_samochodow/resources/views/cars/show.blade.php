@@ -39,6 +39,21 @@
                     <div><span class="block text-gray-500">Skrzynia</span><span class="font-semibold">Automatyczna</span></div>
                 </div>
 
+                <div>
+                    <span class="block text-gray-500">Skrzynia</span>
+                    <span class="font-semibold">
+                        {{ $car->transmission === 'automatic' ? 'Automatyczna' : 'Manualna' }}
+                    </span>
+                </div>
+
+                <div class="flex flex-wrap gap-1 mb-4">
+                        @foreach($car->features as $feature)
+                            <span class="inline-block bg-blue-50 text-blue-700 text-[10px] px-2 py-1 rounded border border-blue-100">
+                                {{ $feature->name }}
+                            </span>
+                        @endforeach   
+                </div>
+
                 <!-- Formularz Rezerwacji -->
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
                     <h3 class="font-bold text-blue-800 mb-3">Rezerwuj termin</h3>

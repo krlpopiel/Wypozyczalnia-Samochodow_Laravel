@@ -54,6 +54,9 @@
                                     <a href="{{ route('employee.dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-red-300 text-sm font-bold leading-5 text-red-600 hover:text-red-800 focus:outline-none focus:text-red-800 focus:border-red-300 transition duration-150 ease-in-out">
                                         Panel Pracownika
                                     </a>
+                                    <a href="{{ route('employee.management') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-purple-300 text-sm font-bold leading-5 text-purple-600 hover:text-purple-800 focus:outline-none focus:text-purple-800 focus:border-purple-300 transition duration-150 ease-in-out">
+                                        Zarządzanie
+                                    </a>
                                 @endif
                             @endauth
                         </div>

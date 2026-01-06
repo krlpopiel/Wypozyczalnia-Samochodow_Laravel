@@ -12,7 +12,8 @@ class Car extends Model
     protected $fillable = [
         'brand_id', 'car_type_id', 'branch_id', 'model', 
         'registration_plate', 'year', 'color', 'mileage', 
-        'daily_rate', 'image_path', 'is_available'
+        'daily_rate', 'image_path', 'is_available',
+        'transmission'
     ];
 
     // Relacje

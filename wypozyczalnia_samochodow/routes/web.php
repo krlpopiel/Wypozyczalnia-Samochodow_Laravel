@@ -34,6 +34,30 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:admin,employee'])->prefix('employee')->name('employee.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [EmployeeController::class, 'index'])->name('dashboard');
-    // Zmiana statusu
     Route::patch('/rentals/{rental}/status', [EmployeeController::class, 'updateStatus'])->name('rentals.status');
+
+    // Panel Zarządzania (Flota i Oddziały)
+    Route::get('/management', [EmployeeController::class, 'management'])->name('management');
+    
+    // CRUD Oddziały
+    Route::post('/branches', [EmployeeController::class, 'storeBranch'])->name('branches.store');
+    Route::patch('/branches/{branch}', [EmployeeController::class, 'updateBranch'])->name('branches.update');
+    Route::delete('/branches/{branch}', [EmployeeController::class, 'destroyBranch'])->name('branches.destroy');
+
+    // CRUD Marki 
+    Route::post('/brands', [EmployeeController::class, 'storeBrand'])->name('brands.store');
+    Route::delete('/brands/{brand}', [EmployeeController::class, 'destroyBrand'])->name('brands.destroy');
+
+    // CRUD Wyposażenie
+    Route::post('/features', [EmployeeController::class, 'storeFeature'])->name('features.store');
+    Route::delete('/features/{feature}', [EmployeeController::class, 'destroyFeature'])->name('features.destroy');
+});
+
+// Trasy CRUD Samochodów (dostępne dla pracowników - podpięte pod CarController)
+Route::middleware(['auth', 'role:admin,employee'])->group(function () {
+    Route::get('/cars/create/new', [CarController::class, 'create'])->name('cars.create'); // Zmieniona ścieżka by nie kolidowała z show
+    Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
+    Route::get('/cars/{car}/edit', [CarController::class, 'edit'])->name('cars.edit');
+    Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
+    Route::delete('/cars/{car}', [CarController::class, 'destroy'])->name('cars.destroy');
 });
