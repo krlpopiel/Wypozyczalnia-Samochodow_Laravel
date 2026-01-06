@@ -20,6 +20,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Samochód</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Termin</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uwagi</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Koszt</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
@@ -50,6 +51,20 @@
                                         <div class="text-sm text-gray-500">
                                             do {{ $rental->end_date->format('Y-m-d') }}
                                         </div>
+                                        </td>
+                                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs">
+                                            @if($rental->comments)
+                                            <div class="group relative">
+                                                <span class="truncate block w-full cursor-help border-b border-dotted border-gray-400" title="{{ $rental->comments }}">
+                                                    {{ Str::limit($rental->comments, 20) }}
+                                                </span>
+                                                <div class="hidden group-hover:block absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded z-50 shadow-lg">
+                                                    {{ $rental->comments }}
+                                                </div>
+                                            </div>
+                                        @else
+                                            <span class="text-gray-300">-</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
                                         {{ number_format($rental->total_price, 2) }} zł

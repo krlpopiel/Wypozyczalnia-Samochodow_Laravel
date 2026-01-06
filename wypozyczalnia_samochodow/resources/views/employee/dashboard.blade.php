@@ -21,13 +21,14 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klient</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Samochód</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Termin</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uwagi</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kwota</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach($rentals as $rental)
+                @forelse($rentals as $rental)
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{{ $rental->id }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -35,12 +36,26 @@
                         <div class="text-sm text-gray-500">{{ $rental->user->email }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ $rental->car->brand->name }} {{ $rental->car->model }}</div>
+                        <div class="text-sm text-gray-900">{{ $rental->car->brand->name ?? 'Marka' }} {{ $rental->car->model }}</div>
                         <div class="text-xs text-gray-500">{{ $rental->car->registration_plate }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ $rental->start_date->format('Y-m-d') }} <br> 
                         -> {{ $rental->end_date->format('Y-m-d') }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs">
+                        @if($rental->comments)
+                            <div class="group relative">
+                                <span class="truncate block w-full cursor-help border-b border-dotted border-gray-400" title="{{ $rental->comments }}">
+                                    {{ Str::limit($rental->comments, 20) }}
+                                </span>
+                                <div class="hidden group-hover:block absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded z-50 shadow-lg">
+                                    {{ $rental->comments }}
+                                </div>
+                            </div>
+                        @else
+                            <span class="text-gray-300">-</span>
+                        @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                         {{ number_format($rental->total_price, 2) }} zł
@@ -57,7 +72,7 @@
                             $color = $colors[$rental->status->name] ?? 'bg-gray-100 text-gray-800';
                         @endphp
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $color }}">
-                            {{ $rental->status->label }}
+                            {{ $rental->status->label ?? $rental->status->name }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -89,7 +104,11 @@
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">Brak rezerwacji do wyświetlenia.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
