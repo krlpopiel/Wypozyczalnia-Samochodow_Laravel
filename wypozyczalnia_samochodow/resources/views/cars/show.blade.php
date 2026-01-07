@@ -7,18 +7,22 @@
             <div class="md:w-1/2 bg-gray-100 relative min-h-[400px]">
                 @if($car->image_path)
                     <img src="{{ asset('storage/' . $car->image_path) }}" 
-                         alt="Widok samochodu {{ $car->brand->name }} {{ $car->model }}" 
+                         alt="Zdjęcie samochodu {{ $car->brand->name }} {{ $car->model }}, kolor {{ $car->color }}" 
                          class="w-full h-full object-cover absolute inset-0">
                 @else
-                    <div class="flex items-center justify-center h-full text-gray-500 flex-col">
-                        <span class="text-6xl" aria-hidden="true">🚗</span>
+                    <div class="flex items-center justify-center h-full text-gray-500 flex-col" aria-hidden="true">
+                        <span class="text-6xl">🚗</span>
                         <span class="mt-2 text-sm font-medium">Brak zdjęcia poglądowego</span>
                     </div>
+                    <span class="sr-only">Brak zdjęcia dla tego samochodu.</span>
                 @endif
                 
                 @if(!$car->is_available)
-                    <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-60 flex items-center justify-center">
-                        <span class="bg-red-700 text-white px-6 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-white">Pojazd Niedostępny</span>
+                    <!-- Ostrzeżenie dla czytnika (role="alert") -->
+                    <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-60 flex items-center justify-center" role="alert">
+                        <span class="bg-red-700 text-white px-6 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-white">
+                            Pojazd Niedostępny
+                        </span>
                     </div>
                 @endif
             </div>
@@ -32,41 +36,64 @@
                     </div>
                     <div class="text-right bg-blue-50 p-3 rounded-lg border border-blue-100">
                         <span class="block text-3xl font-bold text-blue-800" id="daily-rate" data-rate="{{ $car->daily_rate }}">
-                            {{ number_format($car->daily_rate, 0) }} zł
+                            <span class="sr-only">Cena: </span>{{ number_format($car->daily_rate, 0) }} zł
                         </span>
-                        <span class="text-blue-800 text-xs font-bold uppercase">Cena za dobę</span>
+                        <span class="text-blue-800 text-xs font-bold uppercase" aria-hidden="true">Cena za dobę</span>
+                        <span class="sr-only">za dobę</span>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 mb-6" aria-label="Cechy główne">
+                <div class="flex flex-wrap items-center gap-2 mb-6" aria-label="Główne cechy pojazdu">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 border border-gray-300">
-                        Typ: {{ $car->type->name }}
+                        <span class="sr-only">Typ nadwozia: </span>{{ $car->type->name }}
                     </span>
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border {{ $car->transmission == 'automatic' ? 'bg-purple-100 text-purple-900 border-purple-200' : 'bg-green-100 text-green-900 border-green-200' }}">
-                        Skrzynia: {{ $car->transmission == 'automatic' ? 'Automatyczna' : 'Manualna' }}
+                        <span class="sr-only">Skrzynia biegów: </span>{{ $car->transmission == 'automatic' ? 'Automatyczna' : 'Manualna' }}
                     </span>
                 </div>
 
-                <hr class="my-6 border-gray-200">
+                <hr class="my-6 border-gray-200" aria-hidden="true">
 
-                <!-- Szczegóły techniczne -->
-                <div class="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm">
-                    <div>
-                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Rocznik</span>
-                        <span class="font-semibold text-gray-900 text-lg">{{ $car->year }}</span>
+                <!-- Szczegóły techniczne z opisami dla czytnika -->
+                <div class="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm" role="list" aria-label="Parametry techniczne">
+                    <div role="listitem">
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1" aria-hidden="true">Rocznik</span>
+                        <span class="font-semibold text-gray-900 text-lg">
+                            <span class="sr-only">Rok produkcji: </span>{{ $car->year }}
+                        </span>
                     </div>
-                    <div>
-                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Przebieg</span>
-                        <span class="font-semibold text-gray-900 text-lg">{{ number_format($car->mileage, 0, ' ', ' ') }} km</span>
+                    <div role="listitem">
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1" aria-hidden="true">Przebieg</span>
+                        <span class="font-semibold text-gray-900 text-lg">
+                            <span class="sr-only">Przebieg: </span>{{ number_format($car->mileage, 0, ' ', ' ') }} km
+                        </span>
                     </div>
-                    <div>
-                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Kolor</span>
-                        <span class="font-semibold text-gray-900">{{ ucfirst($car->color) }}</span>
+                    <div role="listitem">
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1" aria-hidden="true">Kolor</span>
+                        <span class="font-semibold text-gray-900">
+                            <span class="sr-only">Kolor: </span>{{ ucfirst($car->color) }}
+                        </span>
                     </div>
-                    <div>
-                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Lokalizacja</span>
-                        <span class="font-semibold text-gray-900">{{ $car->branch->city }}</span>
+                    <div role="listitem">
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1" aria-hidden="true">Lokalizacja</span>
+                        <span class="font-semibold text-gray-900">
+                            <span class="sr-only">Lokalizacja odbioru: </span>{{ $car->branch->city }}
+                        </span>
                     </div>
+                </div>
+
+                <!-- Wyposażenie -->
+                <div class="mb-8">
+                    <h2 class="text-xs font-bold text-gray-500 uppercase mb-3">Wyposażenie</h2>
+                    <ul class="flex flex-wrap gap-2" aria-label="Lista wyposażenia dodatkowego">
+                        @forelse($car->features as $feature)
+                            <li class="px-3 py-1 bg-white text-gray-700 rounded-full text-xs font-medium border border-gray-300 shadow-sm flex items-center gap-1">
+                                <span aria-hidden="true">✅</span> {{ $feature->name }}
+                            </li>
+                        @empty
+                            <li class="text-gray-500 text-sm italic">Brak dodatkowego wyposażenia</li>
+                        @endforelse
+                    </ul>
                 </div>
 
                 <!-- Formularz Rezerwacji -->
@@ -123,7 +150,8 @@
                                         <span id="location-fee" class="hidden text-xs text-yellow-300 font-bold block mt-1">+ opłata relokacyjna 100 zł</span>
                                     </div>
                                     <div class="text-right">
-                                        <span class="block text-xs text-blue-200 uppercase font-bold">Przewidywany koszt</span>
+                                        <span class="block text-xs text-blue-200 uppercase font-bold" aria-hidden="true">Przewidywany koszt</span>
+                                        <span class="sr-only">Przewidywany koszt całkowity: </span>
                                         <span class="text-3xl font-extrabold text-white" id="total-price">0.00 zł</span>
                                     </div>
                                 </div>
@@ -144,7 +172,7 @@
                                 </button>
                             </form>
                         @else
-                            <div class="text-center p-4 bg-red-600 rounded-lg border border-red-400">
+                            <div class="text-center p-4 bg-red-600 rounded-lg border border-red-400" role="alert">
                                 <p class="font-bold text-white">Samochód tymczasowo wyłączony z floty.</p>
                             </div>
                         @endif

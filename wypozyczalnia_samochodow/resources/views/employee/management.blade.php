@@ -11,8 +11,8 @@
             <h2 id="fleet-heading" class="text-xl font-bold text-gray-800">Zarządzanie Flotą Samochodową</h2>
             
             <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                <form action="{{ route('employee.management') }}" method="GET" class="flex gap-2">
-                    <label for="search_car" class="sr-only">Szukaj samochodu</label>
+                <form action="{{ route('employee.management') }}" method="GET" class="flex gap-2" role="search">
+                    <label for="search_car" class="sr-only">Szukaj samochodu po marce, modelu lub rejestracji</label>
                     <input type="text" id="search_car" name="search_car" value="{{ request('search_car') }}" 
                            placeholder="Szukaj (marka, model, rej.)..." 
                            class="text-sm border-gray-300 rounded-md w-full md:w-64 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
@@ -20,20 +20,21 @@
                         Szukaj
                     </button>
                     @if(request('search_car'))
-                        <a href="{{ route('employee.management') }}" class="text-red-600 hover:text-red-800 text-sm flex items-center font-medium" aria-label="Wyczyść wyszukiwanie">
-                            ✕
+                        <a href="{{ route('employee.management') }}" class="text-red-600 hover:text-red-800 text-sm flex items-center font-medium focus:outline-none focus:underline" aria-label="Wyczyść wyniki wyszukiwania">
+                            <span aria-hidden="true">✕</span> Wyczyść
                         </a>
                     @endif
                 </form>
 
                 <a href="{{ route('cars.create') }}" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded text-sm text-center transition focus:ring-2 focus:ring-offset-2 focus:ring-blue-700">
-                    + Dodaj Nowy
+                    + Dodaj Nowy Samochód
                 </a>
             </div>
         </div>
         
-        <div class="overflow-x-auto" tabindex="0">
-            <table class="min-w-full divide-y divide-gray-200" aria-label="Lista wszystkich samochodów">
+        <div class="overflow-x-auto" tabindex="0" role="region" aria-labelledby="fleet-heading">
+            <table class="min-w-full divide-y divide-gray-200">
+                <caption class="sr-only">Lista wszystkich samochodów we flocie</caption>
                 <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">ID</th>
@@ -47,20 +48,32 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($cars as $car)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">#{{ $car->id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-bold text-gray-900">{{ $car->brand->name }} {{ $car->model }}</div>
-                            <div class="text-xs text-gray-600">{{ $car->year }}</div>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            <span class="sr-only">ID: </span>#{{ $car->id }}<span class="sr-only">.</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-mono">{{ $car->registration_plate }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $car->branch->city }} ({{ $car->branch->name }})</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ $car->daily_rate }} zł</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-gray-900">
+                                <span class="sr-only">Model: </span>{{ $car->brand->name }} {{ $car->model }}<span class="sr-only">.</span>
+                            </div>
+                            <div class="text-xs text-gray-600">
+                                <span class="sr-only">Rocznik: </span>{{ $car->year }}<span class="sr-only">.</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-mono">
+                            <span class="sr-only">Rejestracja: </span>{{ $car->registration_plate }}<span class="sr-only">.</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            <span class="sr-only">Oddział: </span>{{ $car->branch->city }} <span class="sr-only">({{ $car->branch->name }}).</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                            <span class="sr-only">Cena: </span>{{ $car->daily_rate }} zł<span class="sr-only">.</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ route('cars.edit', $car) }}" class="text-indigo-700 hover:text-indigo-900 mr-3 underline focus:outline-none focus:text-indigo-900">Edytuj</a>
+                            <a href="{{ route('cars.edit', $car) }}" class="text-indigo-700 hover:text-indigo-900 mr-3 underline focus:outline-none focus:text-indigo-900 focus:ring-2 focus:ring-indigo-500 rounded px-1" aria-label="Edytuj samochód {{ $car->brand->name }} {{ $car->model }}">Edytuj</a>
                             <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline" onsubmit="return confirm('Czy na pewno usunąć ten samochód?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-700 hover:text-red-900 underline focus:outline-none focus:text-red-900">Usuń</button>
+                                <button type="submit" class="text-red-700 hover:text-red-900 underline focus:outline-none focus:text-red-900 focus:ring-2 focus:ring-red-500 rounded px-1" aria-label="Usuń samochód {{ $car->brand->name }} {{ $car->model }}">Usuń</button>
                             </form>
                         </td>
                     </tr>
@@ -80,7 +93,7 @@
     <!-- Grid dla Słowników -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        <!-- Sekcja Marek -->
+        <!-- 2. Sekcja Marek -->
         <section class="bg-white rounded-lg shadow overflow-hidden border border-gray-200" aria-labelledby="brands-heading">
             <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                 <h3 id="brands-heading" class="font-bold text-gray-800">Marki Samochodów</h3>
@@ -90,7 +103,7 @@
                     @csrf
                     <label for="brand_name" class="sr-only">Nazwa marki</label>
                     <input type="text" id="brand_name" name="name" placeholder="Nowa marka (np. Tesla)" required class="flex-1 text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                    <button type="submit" class="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600">Dodaj</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600" aria-label="Dodaj nową markę">Dodaj</button>
                 </form>
             </div>
             <ul class="divide-y divide-gray-100 max-h-60 overflow-y-auto" role="list">
@@ -99,14 +112,14 @@
                     <span class="text-gray-900">{{ $brand->name }}</span>
                     <form action="{{ route('employee.brands.destroy', $brand) }}" method="POST" onsubmit="return confirm('Usunąć markę?');">
                         @csrf @method('DELETE')
-                        <button class="text-red-600 hover:text-red-800 underline focus:outline-none focus:text-red-800" aria-label="Usuń markę {{ $brand->name }}">Usuń</button>
+                        <button class="text-red-600 hover:text-red-800 underline focus:outline-none focus:text-red-800 rounded px-1 focus:ring-2 focus:ring-red-500" aria-label="Usuń markę {{ $brand->name }}">Usuń</button>
                     </form>
                 </li>
                 @endforeach
             </ul>
         </section>
 
-        <!-- Sekcja Wyposażenia -->
+        <!-- 3. Sekcja Wyposażenia -->
         <section class="bg-white rounded-lg shadow overflow-hidden border border-gray-200" aria-labelledby="features-heading">
             <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                 <h3 id="features-heading" class="font-bold text-gray-800">Opcje Wyposażenia</h3>
@@ -116,7 +129,7 @@
                     @csrf
                     <label for="feature_name" class="sr-only">Nazwa wyposażenia</label>
                     <input type="text" id="feature_name" name="name" placeholder="Nowe wyposażenie (np. Hak)" required class="flex-1 text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                    <button type="submit" class="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600">Dodaj</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600" aria-label="Dodaj nowe wyposażenie">Dodaj</button>
                 </form>
             </div>
             <ul class="divide-y divide-gray-100 max-h-60 overflow-y-auto" role="list">
@@ -125,7 +138,7 @@
                     <span class="text-gray-900">{{ $feature->name }}</span>
                     <form action="{{ route('employee.features.destroy', $feature) }}" method="POST" onsubmit="return confirm('Usunąć to wyposażenie?');">
                         @csrf @method('DELETE')
-                        <button class="text-red-600 hover:text-red-800 underline focus:outline-none focus:text-red-800" aria-label="Usuń wyposażenie {{ $feature->name }}">Usuń</button>
+                        <button class="text-red-600 hover:text-red-800 underline focus:outline-none focus:text-red-800 rounded px-1 focus:ring-2 focus:ring-red-500" aria-label="Usuń opcję {{ $feature->name }}">Usuń</button>
                     </form>
                 </li>
                 @endforeach
@@ -133,7 +146,7 @@
         </section>
     </div>
 
-    <!-- Sekcja Oddziałów -->
+    <!-- 4. Sekcja Oddziałów -->
     <section class="bg-white rounded-lg shadow overflow-hidden border border-gray-200" aria-labelledby="branches-heading">
         <!-- Sekcja Oddziałów -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
