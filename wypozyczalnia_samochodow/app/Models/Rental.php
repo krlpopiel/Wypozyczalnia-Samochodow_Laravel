@@ -11,7 +11,8 @@ class Rental extends Model
 
     protected $fillable = [
         'user_id', 'car_id', 'rental_status_id', 
-        'start_date', 'end_date', 'total_price', 'comments'
+        'start_date', 'end_date', 'total_price', 'comments',
+        'origin_branch_id', 'destination_branch_id'
     ];
 
     protected $casts = [
@@ -32,5 +33,20 @@ class Rental extends Model
     public function status()
     {
         return $this->belongsTo(RentalStatus::class, 'rental_status_id');
+    }
+
+    public function originBranch()
+    {
+        return $this->belongsTo(Branch::class, 'origin_branch_id');
+    }
+
+    public function destinationBranch()
+    {
+        return $this->belongsTo(Branch::class, 'destination_branch_id');
+    }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
     }
 }

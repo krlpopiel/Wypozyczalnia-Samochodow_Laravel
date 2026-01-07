@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Rental;
 use App\Models\RentalStatus;
+use App\Models\Car;
+use App\Models\Branch;
+use App\Models\Brand;   
+use App\Models\Feature; 
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -13,7 +17,8 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Rental::with(['user', 'car.brand', 'status'])->latest();
+         $query = Rental::with(['user', 'car.brand', 'status', 'originBranch', 'destinationBranch'])
+                       ->orderBy('id', 'desc'); 
 
         // Filtrowanie po statusie
         if ($request->has('status')) {
@@ -38,13 +43,104 @@ class EmployeeController extends Controller
         $request->validate([
             'status' => 'required|exists:rental_statuses,name'
         ]);
-
         $status = RentalStatus::where('name', $request->status)->first();
         $rental->update(['rental_status_id' => $status->id]);
-
-        // Jeśli status to 'ongoing' (Wydanie auta) -> można dodać logikę oznaczania auta jako niedostępne
-        // Jeśli status to 'completed' (Zwrot) -> można oznaczyć jako dostępne
-
         return back()->with('success', "Status rezerwacji #{$rental->id} został zmieniony na: {$status->label}");
+    }
+
+     public function management(Request $request)
+    {
+        $carsQuery = Car::with(['brand', 'branch']);
+
+        if ($request->filled('search_car')) {
+            $searchTerms = explode(' ', $request->search_car);
+            
+            $carsQuery->where(function($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    if (!empty($term)) {
+                        $q->where(function($subQ) use ($term) {
+                            $subQ->where('model', 'like', "%{$term}%")
+                                 ->orWhere('registration_plate', 'like', "%{$term}%") 
+                                 ->orWhereHas('brand', function($bq) use ($term) {
+                                     $bq->where('name', 'like', "%{$term}%");
+                                 });
+                        });
+                    }
+                }
+            });
+        }
+
+        $cars = $carsQuery->paginate(10)->withQueryString();
+        
+        $branches = Branch::all();
+        $brands = Brand::all();
+        $features = Feature::all();
+        
+        return view('employee.management', compact('cars', 'branches', 'brands', 'features'));
+    }
+
+    public function storeBranch(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        Branch::create($request->all());
+        return back()->with('success', 'Oddział został dodany.');
+    }
+
+    public function updateBranch(Request $request, Branch $branch)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $branch->update($request->all());
+        return back()->with('success', 'Dane oddziału zaktualizowane.');
+    }
+
+    public function destroyBranch(Branch $branch)
+    {
+        if ($branch->cars()->count() > 0) {
+            return back()->withErrors(['branch' => 'Nie można usunąć oddziału, do którego przypisane są samochody.']);
+        }
+        $branch->delete();
+        return back()->with('success', 'Oddział został usunięty.');
+    }
+
+    public function storeBrand(Request $request)
+    {
+        $request->validate(['name' => 'required|string|unique:brands,name']);
+        Brand::create(['name' => $request->name]);
+        return back()->with('success', 'Nowa marka została dodana.');
+    }
+
+    public function destroyBrand(Brand $brand)
+    {
+        if ($brand->cars()->count() > 0) return back()->withErrors(['brand' => 'Nie można usunąć marki, która ma przypisane auta.']);
+        $brand->delete();
+        return back()->with('success', 'Marka usunięta.');
+    }
+
+    public function storeFeature(Request $request)
+    {
+        $request->validate(['name' => 'required|string|unique:features,name']);
+        Feature::create(['name' => $request->name]);
+        return back()->with('success', 'Nowy element wyposażenia dodany.');
+    }
+
+    public function destroyFeature(Feature $feature)
+    {
+        if ($feature->cars()->exists()) {
+            return back()->withErrors(['features' => "Nie można usunąć opcji '{$feature->name}', ponieważ jest przypisana do jednego lub więcej samochodów."]);
+        }
+        $feature->delete();
+        return back()->with('success', 'Element wyposażenia usunięty.');
     }
 }

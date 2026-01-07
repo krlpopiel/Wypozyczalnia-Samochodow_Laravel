@@ -12,7 +12,8 @@ class Car extends Model
     protected $fillable = [
         'brand_id', 'car_type_id', 'branch_id', 'model', 
         'registration_plate', 'year', 'color', 'mileage', 
-        'daily_rate', 'image_path', 'is_available'
+        'daily_rate', 'image_path', 'is_available',
+        'transmission'
     ];
 
     // Relacje
@@ -39,6 +40,11 @@ class Car extends Model
     public function rentals()
     {
         return $this->hasMany(Rental::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 
     // Scope do filtrowania dostępnych aut

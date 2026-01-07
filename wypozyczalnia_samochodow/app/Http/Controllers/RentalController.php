@@ -12,14 +12,15 @@ use Carbon\Carbon;
 class RentalController extends Controller
 {
     /**
-     * Zapisuje nową rezerwację z uwzględnieniem przerwy technicznej.
+     * Zapisuje nową rezerwację z uwzględnieniem lokalizacji i opłaty.
      */
     public function store(Request $request, Car $car)
     {
-        // 1. Walidacja danych wejściowych
         $request->validate([
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'diff_location' => 'nullable|string', 
+            'destination_branch_id' => 'nullable|exists:branches,id',
         ], [
             'start_date.after_or_equal' => 'Data początkowa nie może być wcześniejsza niż dzisiaj.',
             'end_date.after_or_equal' => 'Data końcowa musi być równa lub późniejsza niż data początkowa.',
@@ -28,14 +29,9 @@ class RentalController extends Controller
         $start = Carbon::parse($request->start_date);
         $end = Carbon::parse($request->end_date);
 
-        // 2. Sprawdzenie dostępności z uwzględnieniem 1 dnia przerwy
-        // Logika: Nowa rezerwacja koliduje, jeśli jej zakres (poszerzony o 1 dzień marginesu)
-        // nachodzi na istniejące rezerwacje.
-        // Wzór kolizji: (StartA <= KoniecB + 1) AND (KoniecA >= StartB - 1)
-        
+        // 1. Sprawdzenie dostępności (z przerwą techniczną)
         $exists = Rental::where('car_id', $car->id)
             ->whereHas('status', function ($q) {
-                // Sprawdzamy wszystkie rezerwacje, które nie są anulowane
                 $q->where('name', '!=', 'cancelled');
             })
             ->where(function ($query) use ($start, $end) {
@@ -46,17 +42,31 @@ class RentalController extends Controller
 
         if ($exists) {
             return back()->withErrors([
-                'start_date' => 'Samochód jest niedostępny w wybranym terminie (wymagany jest też min. 1 dzień przerwy między wynajmami).'
+                'start_date' => 'Samochód jest niedostępny w wybranym terminie (wymagana przerwa techniczna).'
             ])->withInput();
+        }
+
+        // 2. Logika Lokalizacji
+        $originBranchId = $car->branch_id; // Zawsze odbieramy tam gdzie stoi
+        $destinationBranchId = $originBranchId; // Domyślnie oddajemy tam samo
+        $extraFee = 0;
+
+        // Jeśli zaznaczono "Zwrot w innej lokalizacji"
+        if ($request->has('diff_location') && $request->filled('destination_branch_id')) {
+            $destinationBranchId = $request->destination_branch_id;
+            // Dolicz opłatę tylko jeśli faktycznie wybrano inny oddział
+            if ($originBranchId != $destinationBranchId) {
+                $extraFee = 100;
+            }
         }
 
         // 3. Obliczenie ceny
         $days = $start->diffInDays($end);
-        if ($days == 0) $days = 1; // Minimum 1 dzień płatny
+        if ($days == 0) $days = 1;
         
-        $totalPrice = $days * $car->daily_rate;
+        $totalPrice = ($days * $car->daily_rate) + $extraFee;
 
-        // 4. Pobranie statusu 'pending'
+        // 4. Pobranie statusu
         $status = RentalStatus::where('name', 'pending')->firstOrFail();
 
         // 5. Zapis w bazie
@@ -67,18 +77,18 @@ class RentalController extends Controller
             'start_date' => $start,
             'end_date' => $end,
             'total_price' => $totalPrice,
+            'origin_branch_id' => $originBranchId,
+            'destination_branch_id' => $destinationBranchId,
             'comments' => $request->comments,
         ]);
 
-        return redirect()->route('cars.index')->with('success', 'Rezerwacja została złożona pomyślnie! Oczekuj na potwierdzenie.');
+        return redirect()->route('cars.index')->with('success', 'Rezerwacja złożona pomyślnie! ' . ($extraFee > 0 ? '(Doliczono opłatę za zwrot w innym oddziale)' : ''));
     }
 
-    /**
-     * Wyświetla rezerwacje zalogowanego klienta.
-     */
     public function index()
     {
-        $rentals = Rental::with(['car.brand', 'status'])
+        // Eager loading oddziałów dla wydajności
+        $rentals = Rental::with(['car.brand', 'status', 'originBranch', 'destinationBranch', 'review'])
             ->where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
