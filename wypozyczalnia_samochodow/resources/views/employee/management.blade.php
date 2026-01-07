@@ -5,11 +5,29 @@
     
     <!-- Sekcja Samochodów -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <div class="p-6 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center bg-gray-50 gap-4">
             <h2 class="text-xl font-bold text-gray-800">Zarządzanie Flotą Samochodową</h2>
-            <a href="{{ route('cars.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
-                + Dodaj Nowy Samochód
-            </a>
+            
+            <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                <!-- WYSZUKIWARKA -->
+                <form action="{{ route('employee.management') }}" method="GET" class="flex gap-2">
+                    <input type="text" name="search_car" value="{{ request('search_car') }}" 
+                           placeholder="Szukaj (marka, model, rej.)..." 
+                           class="text-sm border-gray-300 rounded-md w-full md:w-64 focus:ring-blue-500 focus:border-blue-500">
+                    <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded text-sm transition">
+                        Szukaj
+                    </button>
+                    @if(request('search_car'))
+                        <a href="{{ route('employee.management') }}" class="text-red-600 hover:text-red-800 text-sm flex items-center">
+                            ✕
+                        </a>
+                    @endif
+                </form>
+
+                <a href="{{ route('cars.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm text-center transition">
+                    + Dodaj Nowy
+                </a>
+            </div>
         </div>
         
         <div class="overflow-x-auto">
@@ -25,7 +43,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($cars as $car)
+                    @forelse($cars as $car)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{{ $car->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -44,7 +62,11 @@
                             </form>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500 italic">Brak wyników wyszukiwania.</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -53,9 +75,10 @@
         </div>
     </div>
 
+    <!-- Grid dla Słowników -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        <!-- 2. Sekcja Marek -->
+        <!-- Sekcja Marek -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                 <h3 class="font-bold text-gray-700">Marki Samochodów</h3>
@@ -80,7 +103,7 @@
             </ul>
         </div>
 
-        <!-- 3. Sekcja Wyposażenia -->
+        <!-- Sekcja Wyposażenia -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                 <h3 class="font-bold text-gray-700">Opcje Wyposażenia</h3>

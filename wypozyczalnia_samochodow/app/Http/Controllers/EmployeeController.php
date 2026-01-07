@@ -47,12 +47,33 @@ class EmployeeController extends Controller
         return back()->with('success', "Status rezerwacji #{$rental->id} został zmieniony na: {$status->label}");
     }
 
-    public function management()
+     public function management(Request $request)
     {
-        $cars = Car::with(['brand', 'branch'])->paginate(10);
+        $carsQuery = Car::with(['brand', 'branch']);
+
+        if ($request->filled('search_car')) {
+            $searchTerms = explode(' ', $request->search_car);
+            
+            $carsQuery->where(function($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    if (!empty($term)) {
+                        $q->where(function($subQ) use ($term) {
+                            $subQ->where('model', 'like', "%{$term}%")
+                                 ->orWhere('registration_plate', 'like', "%{$term}%") 
+                                 ->orWhereHas('brand', function($bq) use ($term) {
+                                     $bq->where('name', 'like', "%{$term}%");
+                                 });
+                        });
+                    }
+                }
+            });
+        }
+
+        $cars = $carsQuery->paginate(10)->withQueryString();
+        
         $branches = Branch::all();
-        $brands = Brand::all();     
-        $features = Feature::all(); 
+        $brands = Brand::all();
+        $features = Feature::all();
         
         return view('employee.management', compact('cars', 'branches', 'brands', 'features'));
     }

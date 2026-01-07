@@ -10,7 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Focus styles for accessibility */
         *:focus-visible {
             outline: 3px solid #2563eb;
             outline-offset: 2px;
@@ -44,12 +43,10 @@
                             </a>
 
                             @auth
-                                <!-- Link "Moje Rezerwacje" dla każdego zalogowanego -->
                                 <a href="{{ route('rentals.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                                     Moje Rezerwacje
                                 </a>
 
-                                <!-- Link do Panelu Pracownika (Tylko dla admina i pracownika) -->
                                 @if(in_array(Auth::user()->role, ['admin', 'employee']))
                                     <a href="{{ route('employee.dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-red-300 text-sm font-bold leading-5 text-red-600 hover:text-red-800 focus:outline-none focus:text-red-800 focus:border-red-300 transition duration-150 ease-in-out">
                                         Panel Pracownika
@@ -62,23 +59,40 @@
                         </div>
                     </div>
 
-                    <!-- Użytkownik / Auth -->
-                    <div class="flex items-center">
-                        @auth
-                            <span class="mr-4 text-sm text-gray-600">
-                                {{ Auth::user()->name }} 
-                                <span class="text-xs text-gray-400">({{ Auth::user()->role }})</span>
-                            </span>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="text-sm text-red-600 hover:underline">Wyloguj</button>
+                    <!-- Wyszukiwarka i User Menu -->
+                    <div class="flex items-center ml-auto">
+                        <!-- Wyszukiwarka -->
+                        <div class="mr-4 hidden md:block">
+                            <form action="{{ route('cars.index') }}" method="GET" class="relative">
+                                <input type="text" name="search" value="{{ request('search') }}" 
+                                       placeholder="Szukaj samochodu..." 
+                                       class="w-48 lg:w-64 pl-4 pr-10 py-1 text-sm border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                                <button type="submit" class="absolute right-0 top-0 mt-1 mr-2 text-gray-500 hover:text-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </button>
                             </form>
-                        @else
-                            <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-blue-600">Logowanie</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 hover:text-blue-600">Rejestracja</a>
-                            @endif
-                        @endauth
+                        </div>
+
+                        <!-- Użytkownik / Auth -->
+                        <div class="flex items-center">
+                            @auth
+                                <span class="mr-4 text-sm text-gray-600 hidden sm:inline">
+                                    {{ Auth::user()->name }} 
+                                    <span class="text-xs text-gray-400">({{ Auth::user()->role }})</span>
+                                </span>
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-sm text-red-600 hover:underline">Wyloguj</button>
+                                </form>
+                            @else
+                                <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-blue-600">Logowanie</a>
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 hover:text-blue-600">Rejestracja</a>
+                                @endif
+                            @endauth
+                        </div>
                     </div>
                 </div>
             </div>

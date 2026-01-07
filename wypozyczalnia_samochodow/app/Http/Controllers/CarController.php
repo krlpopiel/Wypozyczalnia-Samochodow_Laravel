@@ -20,6 +20,22 @@ class CarController extends Controller
     {
         $query = Car::with(['brand', 'type', 'branch', 'features'])->available();
 
+        if ($request->filled('search')) {
+            $searchTerms = explode(' ', $request->search);       
+            $query->where(function($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    if (!empty($term)) {
+                        $q->where(function($subQ) use ($term) {
+                            $subQ->where('model', 'like', "%{$term}%")
+                                 ->orWhereHas('brand', function($bq) use ($term) {
+                                     $bq->where('name', 'like', "%{$term}%");
+                                 });
+                        });
+                    }
+                }
+            });
+        }
+
         // 1. Filtr Marki
         if ($request->filled('brand')) {
             $query->where('brand_id', $request->brand);
