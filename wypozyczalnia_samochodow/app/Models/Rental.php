@@ -44,4 +44,9 @@ class Rental extends Model
     {
         return $this->belongsTo(Branch::class, 'destination_branch_id');
     }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 }

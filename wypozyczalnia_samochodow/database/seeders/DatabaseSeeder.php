@@ -229,6 +229,7 @@ class DatabaseSeeder extends Seeder
                     DB::table('reviews')->insert([
                         'user_id' => $client->id,
                         'car_id' => $car['id'],
+                        'rental_id' => $rentalId,
                         'rating' => rand(3, 5),
                         'comment' => ['Świetne auto!', 'Polecam, czysto i sprawnie.', 'Wszystko ok.', 'Trochę duże spalanie, ale wygodny.'][rand(0, 3)],
                         'created_at' => $end->addDay(),

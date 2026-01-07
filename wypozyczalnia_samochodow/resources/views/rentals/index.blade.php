@@ -31,9 +31,7 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-xl" aria-hidden="true">
-                                                🚗
-                                            </div>
+                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-xl" aria-hidden="true">🚗</div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-bold text-gray-900">
                                                     <span class="sr-only">Samochód: </span>{{ $rental->car->brand->name ?? 'Marka' }} {{ $rental->car->model }}
@@ -52,46 +50,37 @@
                                             <span class="sr-only">Do dnia: </span>{{ $rental->end_date->format('Y-m-d') }}
                                         </div>
                                     </td>
-                                    
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         <div class="flex flex-col gap-1">
-                                            <div>
-                                                <span class="text-xs text-gray-500 uppercase font-semibold" aria-hidden="true">Odbiór:</span> 
-                                                <span class="sr-only">Miejsce odbioru: </span>
-                                                <strong>{{ $rental->originBranch->city ?? '-' }}</strong>
-                                            </div>
-                                            <div>
-                                                <span class="text-xs text-gray-500 uppercase font-semibold" aria-hidden="true">Zwrot:</span> 
-                                                <span class="sr-only">, Miejsce zwrotu: </span>
-                                                <strong>{{ $rental->destinationBranch->city ?? '-' }}</strong>
-                                            </div>
+                                            <div><span class="text-xs text-gray-500 uppercase font-semibold">Odbiór:</span> <strong>{{ $rental->originBranch->city ?? '-' }}</strong></div>
+                                            <div><span class="text-xs text-gray-500 uppercase font-semibold">Zwrot:</span> <strong>{{ $rental->destinationBranch->city ?? '-' }}</strong></div>
                                         </div>
                                     </td>
-
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
-                                        <span class="sr-only">Koszt całkowity: </span>{{ number_format($rental->total_price, 2) }} zł
+                                        {{ number_format($rental->total_price, 2) }} zł
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @php
-                                            $statusClasses = [
-                                                'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                                                'confirmed' => 'bg-green-100 text-green-800 border-green-200',
-                                                'ongoing' => 'bg-blue-100 text-blue-800 border-blue-200',
-                                                'completed' => 'bg-gray-100 text-gray-800 border-gray-200',
-                                                'cancelled' => 'bg-red-100 text-red-800 border-red-200',
-                                            ];
-                                            $class = $statusClasses[$rental->status->name] ?? 'bg-gray-100 text-gray-800 border-gray-200';
-                                        @endphp
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border {{ $class }}">
-                                            <span class="sr-only">Status: </span>{{ $rental->status->label ?? $rental->status->name }}
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border bg-gray-100 text-gray-800 border-gray-200">
+                                            {{ $rental->status->label ?? $rental->status->name }}
                                         </span>
                                     </td>
+                                    
+                                    <!-- LOGIKA PRZYCISKU OPINII -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         @if($rental->status->name === 'completed')
-                                            <!-- Przycisk dodawania opinii -->
-                                            <a href="{{ route('reviews.create', $rental) }}" class="text-indigo-600 hover:text-indigo-900 font-bold underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-1">
-                                                Wystaw opinię
-                                            </a>
+                                            @if($rental->review)
+                                                <!-- Jeśli opinia już istnieje -->
+                                                <div class="flex items-center text-yellow-500" title="Już oceniono">
+                                                    <span class="font-bold mr-1">{{ $rental->review->rating }}</span>
+                                                    <span aria-hidden="true">★</span>
+                                                    <span class="sr-only">Wystawiono ocenę {{ $rental->review->rating }} na 5</span>
+                                                </div>
+                                            @else
+                                                <!-- Jeśli brak opinii -->
+                                                <a href="{{ route('reviews.create', $rental) }}" class="text-indigo-600 hover:text-indigo-900 font-bold underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-1">
+                                                    Wystaw opinię
+                                                </a>
+                                            @endif
                                         @elseif($rental->status->name === 'pending')
                                             <span class="text-gray-500 italic">Oczekiwanie...</span>
                                         @else
@@ -103,10 +92,7 @@
                         </tbody>
                     </table>
                 </div>
-                
-                <div class="mt-4">
-                    {{ $rentals->links() }}
-                </div>
+                <div class="mt-4">{{ $rentals->links() }}</div>
             @endif
         </div>
     </div>

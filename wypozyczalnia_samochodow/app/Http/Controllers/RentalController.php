@@ -88,7 +88,7 @@ class RentalController extends Controller
     public function index()
     {
         // Eager loading oddziałów dla wydajności
-        $rentals = Rental::with(['car.brand', 'status', 'originBranch', 'destinationBranch'])
+        $rentals = Rental::with(['car.brand', 'status', 'originBranch', 'destinationBranch', 'review'])
             ->where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
