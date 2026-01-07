@@ -31,12 +31,6 @@
     </style>
 </head>
 <body class="font-sans antialiased bg-gray-100 text-gray-900">
-    
-    <!-- WCAG 2.4.1 - Skip Link -->
-    <a href="#main-content" 
-       class="absolute top-0 left-0 p-3 bg-blue-700 text-white -translate-y-full transition-transform focus:translate-y-0 z-50 font-bold shadow-lg">
-        Przejdź do głównej treści
-    </a>
 
     <div class="min-h-screen flex flex-col">
         
@@ -156,9 +150,10 @@
 
         <footer class="bg-gray-900 text-white py-8 mt-auto border-t-4 border-blue-600">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <p class="text-gray-300">&copy; {{ date('Y') }} AutoRent. Aplikacja dostępna cyfrowo.</p>
+                <p class="text-gray-300">&copy; {{ date('Y') }} AutoRent - Adrian Popielarczyk 2026.</p>
             </div>
         </footer>
     </div>
+    @assistForWCAG
 </body>
 </html>

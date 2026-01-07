@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c514d8f7b9fc5970bdd94287905ef584",
+    "content-hash": "3ad7fdd95c0a28297af0f1534adee7e9",
     "packages": [
         {
             "name": "brick/math",
@@ -209,6 +209,57 @@
                 "source": "https://github.com/dflydev/dflydev-dot-access-data/tree/v3.0.3"
             },
             "time": "2024-07-08T12:26:09+00:00"
+        },
+        {
+            "name": "dockcodes/assistforwcag-laravel",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dockcodes/assistforwcag-laravel.git",
+                "reference": "6db53bb7aa7078060ae3d8c0a707d55e752dc230"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dockcodes/assistforwcag-laravel/zipball/6db53bb7aa7078060ae3d8c0a707d55e752dc230",
+                "reference": "6db53bb7aa7078060ae3d8c0a707d55e752dc230",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^9|^10|^11|^12|^13",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "AssistForWCAG": "Dock\\AssistForWCAG\\Facades\\AssistForWCAG"
+                    },
+                    "providers": [
+                        "Dock\\AssistForWCAG\\DockServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dock\\AssistForWCAG\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jacek Labudda",
+                    "email": "j.labudda@creativa.studio"
+                }
+            ],
+            "description": "Package to inject accessibility widget",
+            "support": {
+                "issues": "https://github.com/dockcodes/assistforwcag-laravel/issues",
+                "source": "https://github.com/dockcodes/assistforwcag-laravel/tree/1.0.1"
+            },
+            "time": "2025-09-14T11:32:26+00:00"
         },
         {
             "name": "doctrine/inflector",
