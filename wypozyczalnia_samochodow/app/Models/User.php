@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // Dodane pole 'role'
     ];
 
     /**
@@ -44,5 +45,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relacja z rezerwacjami (Rentals).
+     * Użytkownik może mieć wiele rezerwacji.
+     */
+    public function rentals()
+    {
+        return $this->hasMany(Rental::class);
     }
 }

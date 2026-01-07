@@ -11,12 +11,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Wymuszenie widocznego fokusa dla klawiatury - WCAG 2.4.7 */
         *:focus-visible {
-            outline: 3px solid #2563eb; /* Blue-600 */
+            outline: 3px solid #2563eb;
             outline-offset: 2px;
         }
-        /* Klasa dla czytników ekranowych */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -34,7 +32,6 @@
 
     <div class="min-h-screen flex flex-col">
         
-        <!-- WCAG 1.3.1 - Semantyczny tag nav i label -->
         <nav class="bg-white border-b border-gray-100" aria-label="Menu główne">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
@@ -70,6 +67,15 @@
                                        class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out {{ request()->routeIs('employee.management') ? 'border-purple-500 text-gray-900' : 'border-transparent text-purple-600 hover:text-purple-800 focus:text-purple-800 hover:border-purple-300' }}"
                                        @if(request()->routeIs('employee.management')) aria-current="page" @endif>
                                         Zarządzanie
+                                    </a>
+                                @endif
+
+                                <!-- NOWY LINK TYLKO DLA ADMINA -->
+                                @if(Auth::user()->role === 'admin')
+                                    <a href="{{ route('admin.users.index') }}" 
+                                       class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out {{ request()->routeIs('admin.users.*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-indigo-600 hover:text-indigo-800 focus:text-indigo-800 hover:border-indigo-300' }}"
+                                       @if(request()->routeIs('admin.users.*')) aria-current="page" @endif>
+                                        Użytkownicy
                                     </a>
                                 @endif
                             @endauth
@@ -125,7 +131,6 @@
             </header>
         @endif
 
-        <!-- Main Content - ID for Skip Link -->
         <main id="main-content" class="flex-grow">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 @if(session('success'))
@@ -150,7 +155,7 @@
 
         <footer class="bg-gray-900 text-white py-8 mt-auto border-t-4 border-blue-600">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <p class="text-gray-300">&copy; {{ date('Y') }} AutoRent - Adrian Popielarczyk 2026.</p>
+                <p class="text-gray-300">&copy; {{ date('Y') }}  AutoRent - Adrian Popielarczyk 2026</p>
             </div>
         </footer>
     </div>
