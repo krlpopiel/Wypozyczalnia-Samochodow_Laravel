@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // 4. Cechy (Features)
-        $featuresList = ['Klimatyzacja', 'GPS', 'Automat', 'Podgrzewane fotele', 'Tempomat', 'Bluetooth', 'Kamera cofania', 'Czujniki parkowania'];
+        $featuresList = ['Klimatyzacja', 'GPS', 'Asystent linii', 'Podgrzewane fotele', 'Tempomat', 'Bluetooth', 'Kamera cofania', 'Czujniki parkowania'];
         $featureIds = [];
         foreach($featuresList as $f) {
             $exists = DB::table('features')->where('name', $f)->first();
