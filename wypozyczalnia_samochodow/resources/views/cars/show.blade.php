@@ -1,22 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
         <div class="md:flex">
             <!-- Lewa strona: Zdjęcie -->
             <div class="md:w-1/2 bg-gray-100 relative min-h-[400px]">
                 @if($car->image_path)
-                    <img src="{{ asset('storage/' . $car->image_path) }}" alt="{{ $car->brand->name }} {{ $car->model }}" class="w-full h-full object-cover absolute inset-0">
+                    <img src="{{ asset('storage/' . $car->image_path) }}" 
+                         alt="Widok samochodu {{ $car->brand->name }} {{ $car->model }}" 
+                         class="w-full h-full object-cover absolute inset-0">
                 @else
-                    <div class="flex items-center justify-center h-full text-gray-400 flex-col">
-                        <span class="text-6xl">🚗</span>
-                        <span class="mt-2 text-sm font-medium">Brak zdjęcia</span>
+                    <div class="flex items-center justify-center h-full text-gray-500 flex-col">
+                        <span class="text-6xl" aria-hidden="true">🚗</span>
+                        <span class="mt-2 text-sm font-medium">Brak zdjęcia poglądowego</span>
                     </div>
                 @endif
                 
                 @if(!$car->is_available)
-                    <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-                        <span class="bg-red-600 text-white px-6 py-2 rounded-full font-bold text-lg shadow-lg">Pojazd Niedostępny</span>
+                    <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-60 flex items-center justify-center">
+                        <span class="bg-red-700 text-white px-6 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-white">Pojazd Niedostępny</span>
                     </div>
                 @endif
             </div>
@@ -25,37 +27,53 @@
             <div class="md:w-1/2 p-8 flex flex-col">
                 <div class="flex justify-between items-start mb-2">
                     <div>
-                        <span class="text-sm text-blue-600 font-bold uppercase tracking-wider">{{ $car->brand->name }}</span>
+                        <span class="text-sm text-blue-700 font-bold uppercase tracking-wider block">{{ $car->brand->name }}</span>
                         <h1 class="text-3xl font-bold text-gray-900 leading-tight">{{ $car->model }}</h1>
                     </div>
-                    <div class="text-right bg-blue-50 p-2 rounded-lg">
-                        <span class="block text-3xl font-bold text-blue-700" id="daily-rate" data-rate="{{ $car->daily_rate }}">{{ number_format($car->daily_rate, 0) }} zł</span>
-                        <span class="text-blue-600 text-xs font-semibold">CENA ZA DOBĘ</span>
+                    <div class="text-right bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <span class="block text-3xl font-bold text-blue-800" id="daily-rate" data-rate="{{ $car->daily_rate }}">
+                            {{ number_format($car->daily_rate, 0) }} zł
+                        </span>
+                        <span class="text-blue-800 text-xs font-bold uppercase">Cena za dobę</span>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 mb-6">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        {{ $car->type->name }}
+                <div class="flex flex-wrap items-center gap-2 mb-6" aria-label="Cechy główne">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 border border-gray-300">
+                        Typ: {{ $car->type->name }}
                     </span>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $car->transmission == 'automatic' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
-                        {{ $car->transmission == 'automatic' ? 'Automat' : 'Manual' }}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border {{ $car->transmission == 'automatic' ? 'bg-purple-100 text-purple-900 border-purple-200' : 'bg-green-100 text-green-900 border-green-200' }}">
+                        Skrzynia: {{ $car->transmission == 'automatic' ? 'Automatyczna' : 'Manualna' }}
                     </span>
                 </div>
+
+                <hr class="my-6 border-gray-200">
 
                 <!-- Szczegóły techniczne -->
                 <div class="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm">
-                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Rocznik</span><span class="font-semibold text-gray-800">{{ $car->year }}</span></div>
-                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Przebieg</span><span class="font-semibold text-gray-800">{{ number_format($car->mileage, 0, ' ', ' ') }} km</span></div>
-                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Kolor</span><span class="font-semibold text-gray-800">{{ ucfirst($car->color) }}</span></div>
-                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Lokalizacja</span><span class="font-semibold text-gray-800">{{ $car->branch->city }}</span></div>
+                    <div>
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Rocznik</span>
+                        <span class="font-semibold text-gray-900 text-lg">{{ $car->year }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Przebieg</span>
+                        <span class="font-semibold text-gray-900 text-lg">{{ number_format($car->mileage, 0, ' ', ' ') }} km</span>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Kolor</span>
+                        <span class="font-semibold text-gray-900">{{ ucfirst($car->color) }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500 text-xs uppercase font-bold mb-1">Lokalizacja</span>
+                        <span class="font-semibold text-gray-900">{{ $car->branch->city }}</span>
+                    </div>
                 </div>
 
                 <!-- Formularz Rezerwacji -->
-                <div class="bg-blue-600 p-6 rounded-xl shadow-lg text-white mt-auto">
-                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                        <span>📅</span> Kalkulator Rezerwacji
-                    </h3>
+                <div class="bg-blue-700 p-6 rounded-xl shadow-lg text-white mt-auto">
+                    <h2 class="font-bold text-xl mb-4 flex items-center gap-2 text-white">
+                        <span aria-hidden="true">📅</span> Kalkulator Rezerwacji
+                    </h2>
                     
                     @auth
                         @if($car->is_available)
@@ -65,27 +83,30 @@
                                 <!-- Daty -->
                                 <div class="grid grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label for="start_date" class="block text-xs font-medium text-blue-100 mb-1">Odbiór ({{ $car->branch->city }})</label>
+                                        <label for="start_date" class="block text-sm font-bold text-blue-50 mb-1">Odbiór ({{ $car->branch->city }})</label>
                                         <input type="date" name="start_date" id="start_date" min="{{ date('Y-m-d') }}" required 
-                                               class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300">
+                                               aria-required="true"
+                                               class="w-full text-sm border-0 rounded p-2 text-gray-900 focus:ring-2 focus:ring-yellow-400 font-medium">
                                     </div>
                                     <div>
-                                        <label for="end_date" class="block text-xs font-medium text-blue-100 mb-1">Zwrot</label>
+                                        <label for="end_date" class="block text-sm font-bold text-blue-50 mb-1">Zwrot</label>
                                         <input type="date" name="end_date" id="end_date" min="{{ date('Y-m-d') }}" required 
-                                               class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300">
+                                               aria-required="true"
+                                               class="w-full text-sm border-0 rounded p-2 text-gray-900 focus:ring-2 focus:ring-yellow-400 font-medium">
                                     </div>
                                 </div>
 
                                 <!-- Lokalizacja zwrotu -->
-                                <div class="mb-4 bg-blue-700 p-3 rounded-lg border border-blue-500">
+                                <fieldset class="mb-4 bg-blue-800 p-3 rounded-lg border border-blue-600">
+                                    <legend class="sr-only">Opcje zwrotu</legend>
                                     <div class="flex items-center mb-2">
-                                        <input type="checkbox" id="diff_location" name="diff_location" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                        <label for="diff_location" class="ml-2 text-sm font-medium text-blue-100">Zwrot w innej lokalizacji (+100 zł)</label>
+                                        <input type="checkbox" id="diff_location" name="diff_location" class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-yellow-400 focus:ring-offset-blue-800">
+                                        <label for="diff_location" class="ml-2 text-sm font-bold text-white cursor-pointer">Zwrot w innej lokalizacji (+100 zł)</label>
                                     </div>
                                     
-                                    <div id="location-select-wrapper" class="hidden opacity-50 pointer-events-none transition-opacity duration-300">
-                                        <label for="destination_branch_id" class="block text-xs font-medium text-blue-200 mb-1">Wybierz oddział zwrotu</label>
-                                        <select name="destination_branch_id" id="destination_branch_id" class="w-full text-sm border-0 rounded bg-blue-800 text-white focus:ring-2 focus:ring-blue-300">
+                                    <div id="location-select-wrapper" class="hidden transition-opacity duration-300">
+                                        <label for="destination_branch_id" class="block text-xs font-bold text-blue-200 mb-1">Wybierz oddział zwrotu</label>
+                                        <select name="destination_branch_id" id="destination_branch_id" class="w-full text-sm border-0 rounded bg-blue-900 text-white focus:ring-2 focus:ring-yellow-400 p-2">
                                             @foreach($branches as $branch)
                                                 <option value="{{ $branch->id }}" {{ $branch->id == $car->branch_id ? 'selected' : '' }}>
                                                     {{ $branch->city }} ({{ $branch->name }})
@@ -93,44 +114,44 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                </div>
+                                </fieldset>
 
-                                <!-- Podsumowanie Ceny -->
-                                <div class="flex justify-between items-center mb-4 border-t border-blue-500 pt-3">
-                                    <div class="text-sm text-blue-200">
-                                        <span id="days-count">0</span> dni <br>
-                                        <span id="location-fee" class="hidden text-xs text-yellow-300">+ opłata relokacyjna</span>
+                                <!-- Podsumowanie Ceny - Live Region -->
+                                <div class="flex justify-between items-center mb-4 border-t border-blue-500 pt-3" aria-live="polite" aria-atomic="true">
+                                    <div class="text-sm text-blue-100">
+                                        Liczba dni: <span id="days-count" class="font-bold">0</span> <br>
+                                        <span id="location-fee" class="hidden text-xs text-yellow-300 font-bold block mt-1">+ opłata relokacyjna 100 zł</span>
                                     </div>
                                     <div class="text-right">
-                                        <span class="block text-xs text-blue-200">Przewidywany koszt:</span>
-                                        <span class="text-2xl font-bold" id="total-price">0.00 zł</span>
+                                        <span class="block text-xs text-blue-200 uppercase font-bold">Przewidywany koszt</span>
+                                        <span class="text-3xl font-extrabold text-white" id="total-price">0.00 zł</span>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="comments" class="block text-xs font-medium text-blue-100 mb-1">Uwagi</label>
-                                    <textarea name="comments" id="comments" rows="1" class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300"></textarea>
+                                    <label for="comments" class="block text-sm font-bold text-blue-50 mb-1">Uwagi (opcjonalne)</label>
+                                    <textarea name="comments" id="comments" rows="2" class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-yellow-400 p-2" placeholder="Np. proszę o fotelik dziecięcy..."></textarea>
                                 </div>
 
                                 @if($errors->any())
-                                    <div class="bg-red-500 text-white text-xs p-2 rounded mb-3">
-                                        {{ $errors->first() }}
+                                    <div class="bg-red-600 text-white text-sm p-3 rounded mb-3 border border-red-400" role="alert">
+                                        <strong>Uwaga:</strong> {{ $errors->first() }}
                                     </div>
                                 @endif
 
-                                <button type="submit" class="w-full bg-white text-blue-600 py-3 rounded-lg font-bold hover:bg-gray-100 transition shadow-md">
+                                <button type="submit" class="w-full bg-white text-blue-800 py-3 rounded-lg font-extrabold hover:bg-gray-100 transition shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-800 focus:ring-white">
                                     Potwierdź rezerwację
                                 </button>
                             </form>
                         @else
-                            <div class="text-center p-4 bg-red-500 rounded-lg">
-                                <p class="font-bold">Samochód tymczasowo wyłączony z floty.</p>
+                            <div class="text-center p-4 bg-red-600 rounded-lg border border-red-400">
+                                <p class="font-bold text-white">Samochód tymczasowo wyłączony z floty.</p>
                             </div>
                         @endif
                     @else
                         <div class="text-center py-4">
-                            <p class="text-sm text-blue-100 mb-3">Zaloguj się, aby dokonać rezerwacji.</p>
-                            <a href="{{ route('login') }}" class="inline-block bg-white text-blue-600 px-6 py-2 rounded-lg font-bold hover:bg-gray-100 transition">
+                            <p class="text-sm text-blue-100 mb-3 font-medium">Zaloguj się, aby dokonać rezerwacji.</p>
+                            <a href="{{ route('login') }}" class="inline-block bg-white text-blue-700 px-6 py-2 rounded-lg font-bold hover:bg-gray-100 transition focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white">
                                 Przejdź do logowania
                             </a>
                         </div>
@@ -138,7 +159,7 @@
                 </div>
 
                 <div class="text-center mt-6">
-                    <a href="{{ route('cars.index') }}" class="text-gray-500 text-sm hover:text-gray-800 transition font-medium">← Wróć do wyszukiwarki</a>
+                    <a href="{{ route('cars.index') }}" class="text-gray-600 text-sm hover:text-gray-900 transition font-bold underline focus:text-blue-700">← Wróć do wyszukiwarki</a>
                 </div>
             </div>
         </div>
@@ -173,10 +194,10 @@
                     if (diffLocCheckbox.checked) {
                         total += 100;
                         locFeeEl.classList.remove('hidden');
-                        locSelectWrapper.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+                        locSelectWrapper.classList.remove('hidden');
                     } else {
                         locFeeEl.classList.add('hidden');
-                        locSelectWrapper.classList.add('hidden', 'opacity-50', 'pointer-events-none');
+                        locSelectWrapper.classList.add('hidden');
                     }
 
                     daysCountEl.innerText = days;
@@ -188,9 +209,9 @@
             }
 
             // Event Listenery
-            startDateInput.addEventListener('change', calculatePrice);
-            endDateInput.addEventListener('change', calculatePrice);
-            diffLocCheckbox.addEventListener('change', calculatePrice);
+            if(startDateInput) startDateInput.addEventListener('change', calculatePrice);
+            if(endDateInput) endDateInput.addEventListener('change', calculatePrice);
+            if(diffLocCheckbox) diffLocCheckbox.addEventListener('change', calculatePrice);
         });
     </script>
 @endsection
