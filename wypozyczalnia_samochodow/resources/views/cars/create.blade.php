@@ -17,24 +17,24 @@
                     @endforeach
                 </select>
             </div>
-            <div>
+             <div>
                 <label class="block text-sm font-medium text-gray-700">Model</label>
                 <input type="text" name="model" required class="w-full border-gray-300 rounded-md shadow-sm">
             </div>
         </div>
-
+        
         <!-- Typ i Oddział -->
         <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Typ nadwozia</label>
+             <div>
+                <label class="block text-sm font-medium text-gray-700">Typ</label>
                 <select name="car_type_id" class="w-full border-gray-300 rounded-md shadow-sm">
                     @foreach($types as $type)
                         <option value="{{ $type->id }}">{{ $type->name }}</option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Oddział (Lokalizacja)</label>
+             <div>
+                <label class="block text-sm font-medium text-gray-700">Oddział</label>
                 <select name="branch_id" class="w-full border-gray-300 rounded-md shadow-sm">
                     @foreach($branches as $branch)
                         <option value="{{ $branch->id }}">{{ $branch->city }} ({{ $branch->name }})</option>
@@ -43,33 +43,49 @@
             </div>
         </div>
 
-        <!-- Szczegóły -->
+        <!-- Szczegóły: Rocznik, Kolor, Przebieg -->
         <div class="grid grid-cols-3 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Rocznik</label>
-                <input type="number" name="year" value="{{ date('Y') }}" class="w-full border-gray-300 rounded-md shadow-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Kolor</label>
-                <input type="text" name="color" class="w-full border-gray-300 rounded-md shadow-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Przebieg (km)</label>
-                <input type="number" name="mileage" class="w-full border-gray-300 rounded-md shadow-sm">
-            </div>
+             <div>
+                 <label class="block text-sm font-medium text-gray-700">Rocznik</label>
+                 <input type="number" name="year" value="{{ date('Y') }}" min="1900" max="{{ date('Y') + 1 }}" class="w-full border-gray-300 rounded-md shadow-sm">
+             </div>
+             
+             <!-- KOLOR JAKO SELECT -->
+             <div>
+                 <label class="block text-sm font-medium text-gray-700">Kolor</label>
+                 <select name="color" class="w-full border-gray-300 rounded-md shadow-sm">
+                     <option value="Biały">Biały</option>
+                     <option value="Czarny">Czarny</option>
+                     <option value="Srebrny">Srebrny</option>
+                     <option value="Szary">Szary</option>
+                     <option value="Czerwony">Czerwony</option>
+                     <option value="Niebieski">Niebieski</option>
+                     <option value="Granatowy">Granatowy</option>
+                     <option value="Brązowy">Brązowy</option>
+                     <option value="Beżowy">Beżowy</option>
+                     <option value="Zielony">Zielony</option>
+                     <option value="Żółty">Żółty</option>
+                     <option value="Inny">Inny</option>
+                 </select>
+             </div>
+
+             <div>
+                 <label class="block text-sm font-medium text-gray-700">Przebieg</label>
+                 <input type="number" name="mileage" min="0" class="w-full border-gray-300 rounded-md shadow-sm">
+             </div>
         </div>
 
-        <!-- Finanse i Rejestracja -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Cena za dobę (zł)</label>
-                <input type="number" step="0.01" name="daily_rate" required class="w-full border-gray-300 rounded-md shadow-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Nr Rejestracyjny</label>
-                <input type="text" name="registration_plate" required class="w-full border-gray-300 rounded-md shadow-sm uppercase">
-            </div>
-            <div>
+        <!-- Finanse, Rejestracja i Skrzynia Biegów -->
+        <div class="grid grid-cols-3 gap-4 mb-4">
+             <div>
+                 <label class="block text-sm font-medium text-gray-700">Cena za dobę</label>
+                 <input type="number" step="0.01" name="daily_rate" min="0" required class="w-full border-gray-300 rounded-md shadow-sm">
+             </div>
+             <div>
+                 <label class="block text-sm font-medium text-gray-700">Rejestracja</label>
+                 <input type="text" name="registration_plate" required class="w-full border-gray-300 rounded-md shadow-sm uppercase">
+             </div>
+             <div>
                  <label class="block text-sm font-medium text-gray-700">Skrzynia biegów</label>
                  <select name="transmission" class="w-full border-gray-300 rounded-md shadow-sm">
                      <option value="manual">Manualna</option>
@@ -78,6 +94,7 @@
              </div>
         </div>
 
+        <!-- Wyposażenie -->
         <div class="mb-6 border-t pt-4">
             <label class="block text-sm font-bold text-gray-700 mb-3">Wyposażenie pojazdu</label>
             <div class="grid grid-cols-2 gap-2">
@@ -93,10 +110,10 @@
             </div>
         </div>
 
-        <!-- Zdjęcie -->
-         <div class="mb-6 border-t pt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Zdjęcie samochodu</label>
-            <input type="file" name="image" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+        <!-- Upload -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700">Zdjęcie</label>
+            <input type="file" name="image" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:bg-blue-50 file:text-blue-700"/>
         </div>
 
         <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">

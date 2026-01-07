@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Edytuj samochód: {{ $car->brand->name }} {{ $car->model }}</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Edytuj samochód</h2>
         <a href="{{ route('employee.management') }}" class="text-gray-500 hover:text-gray-700">Wróć</a>
     </div>
 
@@ -51,23 +51,35 @@
         <div class="grid grid-cols-3 gap-4 mb-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700">Rocznik</label>
-                <input type="number" name="year" value="{{ $car->year }}" class="w-full border-gray-300 rounded-md shadow-sm">
+                <input type="number" name="year" value="{{ $car->year }}" min="1900" max="{{ date('Y') + 1 }}" class="w-full border-gray-300 rounded-md shadow-sm">
             </div>
+            
+            <!-- KOLOR JAKO SELECT -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Kolor</label>
-                <input type="text" name="color" value="{{ $car->color }}" class="w-full border-gray-300 rounded-md shadow-sm">
+                <select name="color" class="w-full border-gray-300 rounded-md shadow-sm">
+                    @php
+                        $colors = ['Biały', 'Czarny', 'Srebrny', 'Szary', 'Czerwony', 'Niebieski', 'Granatowy', 'Brązowy', 'Beżowy', 'Zielony', 'Żółty', 'Inny'];
+                    @endphp
+                    @foreach($colors as $colorOption)
+                        <option value="{{ $colorOption }}" {{ $car->color == $colorOption ? 'selected' : '' }}>
+                            {{ $colorOption }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700">Przebieg</label>
-                <input type="number" name="mileage" value="{{ $car->mileage }}" class="w-full border-gray-300 rounded-md shadow-sm">
+                <input type="number" name="mileage" value="{{ $car->mileage }}" min="0" class="w-full border-gray-300 rounded-md shadow-sm">
             </div>
         </div>
 
         <!-- Finanse i Rejestracja -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="grid grid-cols-3 gap-4 mb-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700">Cena za dobę (zł)</label>
-                <input type="number" step="0.01" name="daily_rate" value="{{ $car->daily_rate }}" required class="w-full border-gray-300 rounded-md shadow-sm">
+                <input type="number" step="0.01" name="daily_rate" value="{{ $car->daily_rate }}" min="0" required class="w-full border-gray-300 rounded-md shadow-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">Nr Rejestracyjny</label>
@@ -82,6 +94,17 @@
             </div>
         </div>
 
+        <!-- Status -->
+        <div class="mb-6">
+             <div class="flex items-center">
+                <input id="is_available" name="is_available" type="checkbox" value="1" {{ $car->is_available ? 'checked' : '' }} class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <label for="is_available" class="ml-2 block text-sm text-gray-900">
+                    Samochód dostępny do wypożyczenia (widoczny w ofercie)
+                </label>
+            </div>
+        </div>
+
+        <!-- Wyposażenie -->
         <div class="mb-6 border-t pt-4">
             <label class="block text-sm font-bold text-gray-700 mb-3">Wyposażenie pojazdu</label>
             <div class="grid grid-cols-2 gap-2">
@@ -95,16 +118,6 @@
                         </label>
                     </div>
                 @endforeach
-            </div>
-        </div>
-
-        <!-- Status -->
-        <div class="mb-6">
-             <div class="flex items-center">
-                <input id="is_available" name="is_available" type="checkbox" value="1" {{ $car->is_available ? 'checked' : '' }} class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                <label for="is_available" class="ml-2 block text-sm text-gray-900">
-                    Samochód dostępny do wypożyczenia (widoczny w ofercie)
-                </label>
             </div>
         </div>
 

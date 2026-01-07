@@ -42,13 +42,8 @@ class EmployeeController extends Controller
         $request->validate([
             'status' => 'required|exists:rental_statuses,name'
         ]);
-
         $status = RentalStatus::where('name', $request->status)->first();
         $rental->update(['rental_status_id' => $status->id]);
-
-        // Jeśli status to 'ongoing' (Wydanie auta) -> można dodać logikę oznaczania auta jako niedostępne
-        // Jeśli status to 'completed' (Zwrot) -> można oznaczyć jako dostępne
-
         return back()->with('success', "Status rezerwacji #{$rental->id} został zmieniony na: {$status->label}");
     }
 
@@ -120,7 +115,9 @@ class EmployeeController extends Controller
 
     public function destroyFeature(Feature $feature)
     {
-        $feature->cars()->detach();
+        if ($feature->cars()->exists()) {
+            return back()->withErrors(['features' => "Nie można usunąć opcji '{$feature->name}', ponieważ jest przypisana do jednego lub więcej samochodów."]);
+        }
         $feature->delete();
         return back()->with('success', 'Element wyposażenia usunięty.');
     }
