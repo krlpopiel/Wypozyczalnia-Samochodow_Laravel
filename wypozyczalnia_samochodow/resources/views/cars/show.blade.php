@@ -43,6 +43,23 @@
                     </div>
                 </div>
 
+                <!-- Średnia ocena w szczegółach -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="flex text-yellow-400 text-lg" aria-hidden="true">
+                            @php $rating = $car->reviews?->avg('rating') ?? 0; @endphp
+                            @for($i=1; $i<=5; $i++)
+                                <span>{{ $i <= round($rating) ? '★' : '☆' }}</span>
+                            @endfor
+                        </div>
+                        <span class="text-sm text-gray-600 font-medium">
+                            @if($car->reviews && $car->reviews->count() > 0)
+                                {{ number_format($rating, 1) }} / 5 ({{ $car->reviews->count() }} opinii)
+                            @else
+                                Brak opinii
+                            @endif
+                        </span>
+                    </div>
+
                 <div class="flex flex-wrap items-center gap-2 mb-6" aria-label="Główne cechy pojazdu">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 border border-gray-300">
                         <span class="sr-only">Typ nadwozia: </span>{{ $car->type->name }}
@@ -192,6 +209,60 @@
             </div>
         </div>
     </div>
+
+    <!-- SEKJA OPINII (NOWOŚĆ) -->
+        <section class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" aria-labelledby="reviews-heading">
+            <div class="p-6 border-b border-gray-200 bg-gray-50">
+                <h2 id="reviews-heading" class="text-xl font-bold text-gray-800">Opinie klientów ({{ $car->reviews->count() }})</h2>
+            </div>
+            
+            <div class="divide-y divide-gray-200">
+                @forelse($car->reviews as $review)
+                    <article class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg" aria-hidden="true">
+                                    {{ substr($review->user->name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-gray-900">{{ $review->user->name }}</h3>
+                                    <time datetime="{{ $review->created_at->format('Y-m-d') }}" class="text-xs text-gray-500">
+                                        {{ $review->created_at->format('d.m.Y') }}
+                                    </time>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col items-end">
+                                <div class="flex text-yellow-400 text-sm" aria-label="Ocena: {{ $review->rating }} na 5">
+                                    @for($i=1; $i<=5; $i++)
+                                        <span aria-hidden="true">{{ $i <= $review->rating ? '★' : '☆' }}</span>
+                                    @endfor
+                                </div>
+                                
+                                {{-- Przycisk Usuwania dla Admina --}}
+                                @if(Auth::check() && Auth::user()->role === 'admin')
+                                    <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" class="mt-2" onsubmit="return confirm('Usunąć tę opinię?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-800 text-xs font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-1">
+                                            Usuń opinię
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <p class="mt-3 text-gray-700 text-sm leading-relaxed">
+                            {{ $review->comment }}
+                        </p>
+                    </article>
+                @empty
+                    <div class="p-10 text-center text-gray-500">
+                        <p class="text-lg">Ten samochód nie ma jeszcze żadnych opinii.</p>
+                    </div>
+                @endforelse
+            </div>
+        </section>
 
     <!-- Skrypt do dynamicznej wyceny -->
     <script>

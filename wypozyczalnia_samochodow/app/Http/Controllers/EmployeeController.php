@@ -17,7 +17,8 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Rental::with(['user', 'car.brand', 'status'])->latest();
+         $query = Rental::with(['user', 'car.brand', 'status', 'originBranch', 'destinationBranch'])
+                       ->orderBy('id', 'desc'); 
 
         // Filtrowanie po statusie
         if ($request->has('status')) {

@@ -19,7 +19,7 @@ class RentalController extends Controller
         $request->validate([
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'diff_location' => 'nullable|string', // checkbox
+            'diff_location' => 'nullable|string', 
             'destination_branch_id' => 'nullable|exists:branches,id',
         ], [
             'start_date.after_or_equal' => 'Data początkowa nie może być wcześniejsza niż dzisiaj.',

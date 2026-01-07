@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReviewController;
 
 // Strona główna
 Route::get('/', function () {
@@ -29,6 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/rentals/{car}', [RentalController::class, 'store'])->name('rentals.store');
     // Moje rezerwacje
     Route::get('/my-rentals', [RentalController::class, 'index'])->name('rentals.index');
+    Route::get('/rentals/{rental}/review', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/rentals/{rental}/review', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 // Trasy dla Pracowników i Adminów
@@ -69,4 +72,5 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });

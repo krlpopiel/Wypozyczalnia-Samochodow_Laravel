@@ -18,7 +18,9 @@ class CarController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Car::with(['brand', 'type', 'branch', 'features'])->available();
+         $query = Car::with(['brand', 'type', 'branch', 'features'])
+                    ->withAvg('reviews', 'rating') 
+                    ->available();
 
         if ($request->filled('search')) {
             $searchTerms = explode(' ', $request->search);       

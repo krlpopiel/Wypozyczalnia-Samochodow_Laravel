@@ -36,32 +36,40 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-bold text-gray-900">
-                                                    {{ $rental->car->brand->name ?? 'Marka' }} {{ $rental->car->model }}
+                                                    <span class="sr-only">Samochód: </span>{{ $rental->car->brand->name ?? 'Marka' }} {{ $rental->car->model }}
                                                 </div>
                                                 <div class="text-sm text-gray-600">
-                                                    {{ $rental->car->registration_plate }}
+                                                    <span class="sr-only">, Rejestracja: </span>{{ $rental->car->registration_plate }}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
-                                            <span class="sr-only">Od:</span> {{ $rental->start_date->format('Y-m-d') }}
+                                            <span class="sr-only">Od dnia: </span>{{ $rental->start_date->format('Y-m-d') }}
                                         </div>
                                         <div class="text-sm text-gray-600">
-                                            <span class="sr-only">Do:</span> {{ $rental->end_date->format('Y-m-d') }}
+                                            <span class="sr-only">Do dnia: </span>{{ $rental->end_date->format('Y-m-d') }}
                                         </div>
                                     </td>
                                     
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         <div class="flex flex-col gap-1">
-                                            <div><span class="text-xs text-gray-500 uppercase font-semibold">Odbiór:</span> <strong>{{ $rental->originBranch->city ?? '-' }}</strong></div>
-                                            <div><span class="text-xs text-gray-500 uppercase font-semibold">Zwrot:</span> <strong>{{ $rental->destinationBranch->city ?? '-' }}</strong></div>
+                                            <div>
+                                                <span class="text-xs text-gray-500 uppercase font-semibold" aria-hidden="true">Odbiór:</span> 
+                                                <span class="sr-only">Miejsce odbioru: </span>
+                                                <strong>{{ $rental->originBranch->city ?? '-' }}</strong>
+                                            </div>
+                                            <div>
+                                                <span class="text-xs text-gray-500 uppercase font-semibold" aria-hidden="true">Zwrot:</span> 
+                                                <span class="sr-only">, Miejsce zwrotu: </span>
+                                                <strong>{{ $rental->destinationBranch->city ?? '-' }}</strong>
+                                            </div>
                                         </div>
                                     </td>
 
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
-                                        {{ number_format($rental->total_price, 2) }} zł
+                                        <span class="sr-only">Koszt całkowity: </span>{{ number_format($rental->total_price, 2) }} zł
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @php
@@ -75,11 +83,16 @@
                                             $class = $statusClasses[$rental->status->name] ?? 'bg-gray-100 text-gray-800 border-gray-200';
                                         @endphp
                                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border {{ $class }}">
-                                            {{ $rental->status->label ?? $rental->status->name }}
+                                            <span class="sr-only">Status: </span>{{ $rental->status->label ?? $rental->status->name }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        @if($rental->status->name === 'pending')
+                                        @if($rental->status->name === 'completed')
+                                            <!-- Przycisk dodawania opinii -->
+                                            <a href="{{ route('reviews.create', $rental) }}" class="text-indigo-600 hover:text-indigo-900 font-bold underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-1">
+                                                Wystaw opinię
+                                            </a>
+                                        @elseif($rental->status->name === 'pending')
                                             <span class="text-gray-500 italic">Oczekiwanie...</span>
                                         @else
                                             <span class="text-gray-400" aria-hidden="true">-</span>

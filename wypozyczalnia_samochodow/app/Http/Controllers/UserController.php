@@ -26,7 +26,7 @@ class UserController extends Controller
         }
 
         // Sortowanie po roli, potem po nazwie
-        $users = $query->orderBy('role')->orderBy('name')->paginate(10)->withQueryString();
+        $users = $query->orderBy('role')->orderBy('id')->paginate(10)->withQueryString();
 
         return view('admin.users.index', compact('users'));
     }

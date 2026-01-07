@@ -162,7 +162,18 @@
                                     <span class="text-xs mt-2 font-medium">Brak zdjęcia</span>
                                 </div>
                             @endif
-                            
+                            <!-- NOWOŚĆ: Badge Oceny -->
+                            <div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded shadow font-bold text-xs flex items-center gap-1">
+                                <span aria-hidden="true">★</span>
+                                @if($car->reviews_avg_rating)
+                                    <span>{{ number_format($car->reviews_avg_rating, 1) }}</span>
+                                    <span class="sr-only">Średnia ocena: {{ number_format($car->reviews_avg_rating, 1) }} na 5</span>
+                                @else
+                                    <span>-</span>
+                                    <span class="sr-only">Brak ocen</span>
+                                @endif
+                            </div>
+
                             @if(!$car->is_available)
                                 <span class="absolute top-2 right-2 bg-red-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow">Niedostępny</span>
                             @endif

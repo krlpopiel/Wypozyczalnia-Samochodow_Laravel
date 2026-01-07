@@ -42,6 +42,11 @@ class Car extends Model
         return $this->hasMany(Rental::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     // Scope do filtrowania dostępnych aut
     public function scopeAvailable($query)
     {
