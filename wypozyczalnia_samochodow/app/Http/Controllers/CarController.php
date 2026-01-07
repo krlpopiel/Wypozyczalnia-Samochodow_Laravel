@@ -111,7 +111,10 @@ class CarController extends Controller
     public function show(Car $car)
     {
         $car->load(['features', 'branch', 'brand', 'type']);
-        return view('cars.show', compact('car'));
+        
+        $branches = Branch::all();
+        
+        return view('cars.show', compact('car', 'branches'));
     }
 
     public function create()

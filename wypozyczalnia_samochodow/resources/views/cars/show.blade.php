@@ -22,14 +22,14 @@
             </div>
 
             <!-- Prawa strona: Informacje -->
-            <div class="md:w-1/2 p-8">
+            <div class="md:w-1/2 p-8 flex flex-col">
                 <div class="flex justify-between items-start mb-2">
                     <div>
                         <span class="text-sm text-blue-600 font-bold uppercase tracking-wider">{{ $car->brand->name }}</span>
                         <h1 class="text-3xl font-bold text-gray-900 leading-tight">{{ $car->model }}</h1>
                     </div>
                     <div class="text-right bg-blue-50 p-2 rounded-lg">
-                        <span class="block text-3xl font-bold text-blue-700">{{ number_format($car->daily_rate, 0) }} zł</span>
+                        <span class="block text-3xl font-bold text-blue-700" id="daily-rate" data-rate="{{ $car->daily_rate }}">{{ number_format($car->daily_rate, 0) }} zł</span>
                         <span class="text-blue-600 text-xs font-semibold">CENA ZA DOBĘ</span>
                     </div>
                 </div>
@@ -43,74 +43,73 @@
                     </span>
                 </div>
 
-                <hr class="my-6 border-gray-100">
-
-                <div class="grid grid-cols-2 gap-y-4 gap-x-8 mb-8 text-sm">
-                    <div>
-                        <span class="block text-gray-400 text-xs uppercase mb-1">Rocznik</span>
-                        <span class="font-semibold text-gray-800 text-lg">{{ $car->year }}</span>
-                    </div>
-                    <div>
-                        <span class="block text-gray-400 text-xs uppercase mb-1">Przebieg</span>
-                        <span class="font-semibold text-gray-800 text-lg">{{ number_format($car->mileage, 0, ' ', ' ') }} km</span>
-                    </div>
-                    <div>
-                        <span class="block text-gray-400 text-xs uppercase mb-1">Kolor</span>
-                        <span class="font-semibold text-gray-800">{{ ucfirst($car->color) }}</span>
-                    </div>
-                    <div>
-                        <span class="block text-gray-400 text-xs uppercase mb-1">Numer Rej.</span>
-                        <span class="font-semibold text-gray-800">{{ $car->registration_plate }}</span>
-                    </div>
-                </div>
-
-                <!-- Lokalizacja -->
-                <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-2">Lokalizacja odbioru</h3>
-                    <p class="text-gray-800 font-semibold">{{ $car->branch->name }}</p>
-                    <p class="text-sm text-gray-600">{{ $car->branch->address }}, {{ $car->branch->city }}</p>
-                    <p class="text-sm text-gray-600 mt-1">📞 {{ $car->branch->phone }}</p>
-                </div>
-
-                <!-- Wyposażenie -->
-                <div class="mb-8">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Wyposażenie</h3>
-                    <div class="flex flex-wrap gap-2">
-                        @forelse($car->features as $feature)
-                            <span class="px-3 py-1 bg-white text-gray-700 rounded-full text-xs font-medium border border-gray-300 shadow-sm flex items-center gap-1">
-                                <span>✅</span> {{ $feature->name }}
-                            </span>
-                        @empty
-                            <span class="text-gray-400 text-sm italic">Brak dodatkowego wyposażenia</span>
-                        @endforelse
-                    </div>
+                <!-- Szczegóły techniczne -->
+                <div class="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm">
+                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Rocznik</span><span class="font-semibold text-gray-800">{{ $car->year }}</span></div>
+                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Przebieg</span><span class="font-semibold text-gray-800">{{ number_format($car->mileage, 0, ' ', ' ') }} km</span></div>
+                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Kolor</span><span class="font-semibold text-gray-800">{{ ucfirst($car->color) }}</span></div>
+                    <div><span class="block text-gray-400 text-xs uppercase mb-1">Lokalizacja</span><span class="font-semibold text-gray-800">{{ $car->branch->city }}</span></div>
                 </div>
 
                 <!-- Formularz Rezerwacji -->
-                <div class="bg-blue-600 p-6 rounded-xl shadow-lg text-white">
+                <div class="bg-blue-600 p-6 rounded-xl shadow-lg text-white mt-auto">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                        <span>📅</span> Zarezerwuj ten samochód
+                        <span>📅</span> Kalkulator Rezerwacji
                     </h3>
                     
                     @auth
                         @if($car->is_available)
-                            <form action="{{ route('rentals.store', $car) }}" method="POST">
+                            <form action="{{ route('rentals.store', $car) }}" method="POST" id="rental-form">
                                 @csrf
+                                
+                                <!-- Daty -->
                                 <div class="grid grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label for="start_date" class="block text-xs font-medium text-blue-100 mb-1">Od kiedy</label>
+                                        <label for="start_date" class="block text-xs font-medium text-blue-100 mb-1">Odbiór ({{ $car->branch->city }})</label>
                                         <input type="date" name="start_date" id="start_date" min="{{ date('Y-m-d') }}" required 
                                                class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300">
                                     </div>
                                     <div>
-                                        <label for="end_date" class="block text-xs font-medium text-blue-100 mb-1">Do kiedy</label>
+                                        <label for="end_date" class="block text-xs font-medium text-blue-100 mb-1">Zwrot</label>
                                         <input type="date" name="end_date" id="end_date" min="{{ date('Y-m-d') }}" required 
                                                class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300">
                                     </div>
                                 </div>
+
+                                <!-- Lokalizacja zwrotu -->
+                                <div class="mb-4 bg-blue-700 p-3 rounded-lg border border-blue-500">
+                                    <div class="flex items-center mb-2">
+                                        <input type="checkbox" id="diff_location" name="diff_location" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        <label for="diff_location" class="ml-2 text-sm font-medium text-blue-100">Zwrot w innej lokalizacji (+100 zł)</label>
+                                    </div>
+                                    
+                                    <div id="location-select-wrapper" class="hidden opacity-50 pointer-events-none transition-opacity duration-300">
+                                        <label for="destination_branch_id" class="block text-xs font-medium text-blue-200 mb-1">Wybierz oddział zwrotu</label>
+                                        <select name="destination_branch_id" id="destination_branch_id" class="w-full text-sm border-0 rounded bg-blue-800 text-white focus:ring-2 focus:ring-blue-300">
+                                            @foreach($branches as $branch)
+                                                <option value="{{ $branch->id }}" {{ $branch->id == $car->branch_id ? 'selected' : '' }}>
+                                                    {{ $branch->city }} ({{ $branch->name }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Podsumowanie Ceny -->
+                                <div class="flex justify-between items-center mb-4 border-t border-blue-500 pt-3">
+                                    <div class="text-sm text-blue-200">
+                                        <span id="days-count">0</span> dni <br>
+                                        <span id="location-fee" class="hidden text-xs text-yellow-300">+ opłata relokacyjna</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-xs text-blue-200">Przewidywany koszt:</span>
+                                        <span class="text-2xl font-bold" id="total-price">0.00 zł</span>
+                                    </div>
+                                </div>
+
                                 <div class="mb-4">
-                                    <label for="comments" class="block text-xs font-medium text-blue-100 mb-1">Uwagi do rezerwacji</label>
-                                    <textarea name="comments" id="comments" rows="2" class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300" placeholder="Np. proszę o fotelik dziecięcy..."></textarea>
+                                    <label for="comments" class="block text-xs font-medium text-blue-100 mb-1">Uwagi</label>
+                                    <textarea name="comments" id="comments" rows="1" class="w-full text-sm border-0 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-300"></textarea>
                                 </div>
 
                                 @if($errors->any())
@@ -129,7 +128,7 @@
                             </div>
                         @endif
                     @else
-                        <div class="text-center py-2">
+                        <div class="text-center py-4">
                             <p class="text-sm text-blue-100 mb-3">Zaloguj się, aby dokonać rezerwacji.</p>
                             <a href="{{ route('login') }}" class="inline-block bg-white text-blue-600 px-6 py-2 rounded-lg font-bold hover:bg-gray-100 transition">
                                 Przejdź do logowania
@@ -144,4 +143,54 @@
             </div>
         </div>
     </div>
+
+    <!-- Skrypt do dynamicznej wyceny -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            const diffLocCheckbox = document.getElementById('diff_location');
+            const locSelectWrapper = document.getElementById('location-select-wrapper');
+            const dailyRate = parseFloat(document.getElementById('daily-rate').dataset.rate);
+            
+            const totalPriceEl = document.getElementById('total-price');
+            const daysCountEl = document.getElementById('days-count');
+            const locFeeEl = document.getElementById('location-fee');
+
+            function calculatePrice() {
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+                
+                // Walidacja dat
+                if (startDateInput.value && endDateInput.value && end >= start) {
+                    const diffTime = Math.abs(end - start);
+                    let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (days === 0) days = 1; // Minimum 1 dzień
+
+                    let total = days * dailyRate;
+                    
+                    // Opłata za inną lokalizację
+                    if (diffLocCheckbox.checked) {
+                        total += 100;
+                        locFeeEl.classList.remove('hidden');
+                        locSelectWrapper.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+                    } else {
+                        locFeeEl.classList.add('hidden');
+                        locSelectWrapper.classList.add('hidden', 'opacity-50', 'pointer-events-none');
+                    }
+
+                    daysCountEl.innerText = days;
+                    totalPriceEl.innerText = total.toFixed(2) + ' zł';
+                } else {
+                    daysCountEl.innerText = '0';
+                    totalPriceEl.innerText = '0.00 zł';
+                }
+            }
+
+            // Event Listenery
+            startDateInput.addEventListener('change', calculatePrice);
+            endDateInput.addEventListener('change', calculatePrice);
+            diffLocCheckbox.addEventListener('change', calculatePrice);
+        });
+    </script>
 @endsection
