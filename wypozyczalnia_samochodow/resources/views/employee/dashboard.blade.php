@@ -28,6 +28,27 @@
                        Potwierdzone <span class="sr-only">rezerwacje</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('employee.dashboard', ['status' => 'ongoing']) }}" 
+                       class="inline-block px-3 py-1 text-sm font-medium rounded-full border whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 {{ request('status') == 'ongoing' ? 'bg-indigo-700 text-white border-indigo-800' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
+                       @if(request('status') == 'ongoing') aria-current="page" @endif>
+                       W trakcie <span class="sr-only">wynajmu</span>
+                    </a>
+                </li>
+                 <li>
+                    <a href="{{ route('employee.dashboard', ['status' => 'completed']) }}" 
+                       class="inline-block px-3 py-1 text-sm font-medium rounded-full border whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 {{ request('status') == 'completed' ? 'bg-gray-700 text-white border-gray-800' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
+                       @if(request('status') == 'completed') aria-current="page" @endif>
+                       Zakończone <span class="sr-only">rezerwacje</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('employee.dashboard', ['status' => 'cancelled']) }}" 
+                       class="inline-block px-3 py-1 text-sm font-medium rounded-full border whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 {{ request('status') == 'cancelled' ? 'bg-red-700 text-white border-red-800' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
+                       @if(request('status') == 'cancelled') aria-current="page" @endif>
+                       Anulowane <span class="sr-only">rezerwacje</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>
